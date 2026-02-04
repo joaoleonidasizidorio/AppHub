@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: apphub-backend
+    ports:
+      - "5002:5002"
+    volumes:
+      - ./backend/uploads:/app/uploads
+    restart: always
+
+  frontend:
+    build: ./frontend
+    container_name: apphub-frontend
+    ports:
+      - "5175:80"
+    depends_on:
+      - backend
+    restart: always
+
+volumes:
+  uploads_data:
