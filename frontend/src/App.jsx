@@ -25,6 +25,9 @@ function App() {
   const [iconPreview, setIconPreview] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isUpdatesOpen, setIsUpdatesOpen] = useState(false);
+  const [settingsTab, setSettingsTab] = useState('geral');
   const [changePasswordForm, setChangePasswordForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
   const [showChangePasswords, setShowChangePasswords] = useState({ current: false, new: false, confirm: false });
   const [selectedCategory, setSelectedCategory] = useState('Todos');
@@ -205,11 +208,11 @@ function App() {
         </nav>
 
         <div style={{ marginTop: 'auto' }} className="nav-links">
-          <div className="nav-item">
+          <div className="nav-item" onClick={() => setIsUpdatesOpen(true)}>
             <Bell size={20} />
             <span>Atualizações</span>
           </div>
-          <div className="nav-item">
+          <div className={`nav-item ${isSettingsOpen ? 'active' : ''}`} onClick={() => token ? setIsSettingsOpen(true) : setIsLoginOpen(true)}>
             <Settings size={20} />
             <span>Configurações</span>
           </div>
@@ -235,9 +238,6 @@ function App() {
                 <button className="download-btn" onClick={() => setIsModalOpen(true)}>
                   <Plus size={18} />
                   App
-                </button>
-                <button className="nav-item" onClick={() => setIsChangePasswordOpen(true)} title="Alterar Senha">
-                  <Key size={18} />
                 </button>
                 <div className="nav-item" onClick={handleLogout} title="Sair">
                   <User size={18} />
@@ -550,87 +550,194 @@ function App() {
           </div>
         )}
       </AnimatePresence>
-      {/* Modal de Alterar Senha */}
+      {/* Modal de Alterar Senha (Removido daqui pois agora está em Configurações) */}
+
+      {/* Modal de Configurações */}
       <AnimatePresence>
-        {isChangePasswordOpen && (
+        {isSettingsOpen && (
           <div className="modal-overlay">
             <motion.div
               className="modal-content"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              style={{ maxWidth: '400px' }}
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              style={{ maxWidth: '500px' }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-                <h3>Alterar Senha Admin</h3>
-                <X style={{ cursor: 'pointer' }} onClick={() => setIsChangePasswordOpen(false)} />
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                <h3 style={{ fontSize: '1.5rem', fontWeight: '800' }}>Configurações</h3>
+                <X style={{ cursor: 'pointer' }} onClick={() => setIsSettingsOpen(false)} />
               </div>
 
-              <form onSubmit={handleChangePassword}>
-                <div className="form-group">
-                  <label>Senha Atual</label>
-                  <div style={{ position: 'relative' }}>
-                    <input
-                      type={showChangePasswords.current ? "text" : "password"}
-                      required
-                      value={changePasswordForm.currentPassword}
-                      onChange={e => setChangePasswordForm({ ...changePasswordForm, currentPassword: e.target.value })}
-                      style={{ width: '100%', paddingRight: '45px' }}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowChangePasswords({ ...showChangePasswords, current: !showChangePasswords.current })}
-                      style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
-                    >
-                      {showChangePasswords.current ? <EyeOff size={18} /> : <Eye size={18} />}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="form-group">
-                  <label>Nova Senha</label>
-                  <div style={{ position: 'relative' }}>
-                    <input
-                      type={showChangePasswords.new ? "text" : "password"}
-                      required
-                      value={changePasswordForm.newPassword}
-                      onChange={e => setChangePasswordForm({ ...changePasswordForm, newPassword: e.target.value })}
-                      style={{ width: '100%', paddingRight: '45px' }}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowChangePasswords({ ...showChangePasswords, new: !showChangePasswords.new })}
-                      style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
-                    >
-                      {showChangePasswords.new ? <EyeOff size={18} /> : <Eye size={18} />}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="form-group">
-                  <label>Confirmar Nova Senha</label>
-                  <div style={{ position: 'relative' }}>
-                    <input
-                      type={showChangePasswords.confirm ? "text" : "password"}
-                      required
-                      value={changePasswordForm.confirmPassword}
-                      onChange={e => setChangePasswordForm({ ...changePasswordForm, confirmPassword: e.target.value })}
-                      style={{ width: '100%', paddingRight: '45px' }}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowChangePasswords({ ...showChangePasswords, confirm: !showChangePasswords.confirm })}
-                      style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
-                    >
-                      {showChangePasswords.confirm ? <EyeOff size={18} /> : <Eye size={18} />}
-                    </button>
-                  </div>
-                </div>
-
-                <button type="submit" className="download-btn" style={{ width: '100%', marginTop: '1rem' }}>
-                  Confirmar Alteração
+              <div style={{ display: 'flex', gap: '1rem', borderBottom: '1px solid var(--glass-border)', marginBottom: '1.5rem' }}>
+                <button
+                  onClick={() => setSettingsTab('geral')}
+                  style={{
+                    padding: '0.8rem 1rem',
+                    background: 'none',
+                    border: 'none',
+                    color: settingsTab === 'geral' ? 'var(--primary)' : 'var(--text-secondary)',
+                    borderBottom: settingsTab === 'geral' ? '2px solid var(--primary)' : 'none',
+                    fontWeight: '600',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Geral
                 </button>
-              </form>
+                <button
+                  onClick={() => setSettingsTab('seguranca')}
+                  style={{
+                    padding: '0.8rem 1rem',
+                    background: 'none',
+                    border: 'none',
+                    color: settingsTab === 'seguranca' ? 'var(--primary)' : 'var(--text-secondary)',
+                    borderBottom: settingsTab === 'seguranca' ? '2px solid var(--primary)' : 'none',
+                    fontWeight: '600',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Segurança
+                </button>
+              </div>
+
+              {settingsTab === 'geral' ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                  <div style={{ background: 'rgba(255,255,255,0.02)', padding: '1.2rem', borderRadius: '16px', border: '1px solid var(--glass-border)' }}>
+                    <h4 style={{ marginBottom: '0.5rem' }}>Status do Sistema</h4>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem' }}>
+                      <span style={{ color: 'var(--text-secondary)' }}>Versão</span>
+                      <span>2.0.0 (Premium)</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', marginTop: '0.5rem' }}>
+                      <span style={{ color: 'var(--text-secondary)' }}>Conexão API</span>
+                      <span style={{ color: '#34c759' }}>Online</span>
+                    </div>
+                  </div>
+                  <div style={{ borderTop: '1px solid var(--glass-border)', paddingTop: '1rem' }}>
+                    <h4 style={{ marginBottom: '1rem' }}>Preferências</h4>
+                    <div className="form-group">
+                      <label>Idioma do Painel</label>
+                      <select disabled style={{ cursor: 'not-allowed', opacity: 0.6 }}>
+                        <option>Português (Brasil)</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <form onSubmit={handleChangePassword}>
+                  <div className="form-group" style={{ marginBottom: '1rem' }}>
+                    <label>Senha Atual</label>
+                    <div style={{ position: 'relative' }}>
+                      <input
+                        type={showChangePasswords.current ? "text" : "password"}
+                        required
+                        value={changePasswordForm.currentPassword}
+                        onChange={e => setChangePasswordForm({ ...changePasswordForm, currentPassword: e.target.value })}
+                        style={{ width: '100%', paddingRight: '45px' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowChangePasswords({ ...showChangePasswords, current: !showChangePasswords.current })}
+                        style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
+                      >
+                        {showChangePasswords.current ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="form-group" style={{ marginBottom: '1rem' }}>
+                    <label>Nova Senha</label>
+                    <div style={{ position: 'relative' }}>
+                      <input
+                        type={showChangePasswords.new ? "text" : "password"}
+                        required
+                        value={changePasswordForm.newPassword}
+                        onChange={e => setChangePasswordForm({ ...changePasswordForm, newPassword: e.target.value })}
+                        style={{ width: '100%', paddingRight: '45px' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowChangePasswords({ ...showChangePasswords, new: !showChangePasswords.new })}
+                        style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
+                      >
+                        {showChangePasswords.new ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+                    <label>Confirmar Nova Senha</label>
+                    <div style={{ position: 'relative' }}>
+                      <input
+                        type={showChangePasswords.confirm ? "text" : "password"}
+                        required
+                        value={changePasswordForm.confirmPassword}
+                        onChange={e => setChangePasswordForm({ ...changePasswordForm, confirmPassword: e.target.value })}
+                        style={{ width: '100%', paddingRight: '45px' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowChangePasswords({ ...showChangePasswords, confirm: !showChangePasswords.confirm })}
+                        style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
+                      >
+                        {showChangePasswords.confirm ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <button type="submit" className="download-btn" style={{ width: '100%' }}>
+                    Atualizar Senha
+                  </button>
+                </form>
+              )}
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Modal de Atualizações */}
+      <AnimatePresence>
+        {isUpdatesOpen && (
+          <div className="modal-overlay" onClick={() => setIsUpdatesOpen(false)}>
+            <motion.div
+              className="modal-content"
+              initial={{ x: 300, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: 300, opacity: 0 }}
+              onClick={e => e.stopPropagation()}
+              style={{
+                position: 'fixed',
+                right: '2rem',
+                top: '5rem',
+                maxWidth: '380px',
+                height: 'calc(100vh - 7rem)',
+                margin: 0
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                <h3 style={{ fontSize: '1.4rem', fontWeight: '800' }}>Atualizações</h3>
+                <X style={{ cursor: 'pointer' }} onClick={() => setIsUpdatesOpen(false)} />
+              </div>
+
+              <div style={{ overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {[
+                  { title: 'Novo Layout Premium', date: 'Hoje', desc: 'Interface totalmente reformulada com estilo Glassmorphism.', type: 'feature' },
+                  { title: 'Suporte a Ícones', date: 'Ontem', desc: 'Agora você pode carregar ícones customizados para seus apps.', type: 'feature' },
+                  { title: 'Segurança Melhorada', date: '12 Mar', desc: 'Troca de senha e proteção de rota administrativa.', type: 'fix' },
+                  { title: 'Performance Docker', date: '10 Mar', desc: 'Otimização nas imagens para carregamento mais rápido.', type: 'info' }
+                ].map((update, idx) => (
+                  <div key={idx} style={{ padding: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '16px', border: '1px solid var(--glass-border)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
+                      <span style={{ fontWeight: '700', fontSize: '0.95rem' }}>{update.title}</span>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{update.date}</span>
+                    </div>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>{update.desc}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ marginTop: 'auto', textAlign: 'center', padding: '1rem', borderTop: '1px solid var(--glass-border)' }}>
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Build 2.2.0-stable</p>
+              </div>
             </motion.div>
           </div>
         )}
