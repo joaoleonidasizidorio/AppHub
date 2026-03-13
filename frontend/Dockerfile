@@ -17,14 +17,14 @@ COPY --from=build-stage /app/dist /usr/share/nginx/html
 
 # Configuração customizada do Nginx para suportar roteamento do React (opcional mas recomendado)
 RUN echo "server { \
-    listen 80; \
-    location / { \
-    root /usr/share/nginx/html; \
+    listen 5175; \
+    location /apphub/ { \
+    alias /usr/share/nginx/html/; \
     index index.html index.htm; \
-    try_files \$uri \$uri/ /index.html; \
+    try_files \$uri \$uri/ /apphub/index.html; \
     } \
     }" > /etc/nginx/conf.d/default.conf
 
-EXPOSE 80
+EXPOSE 5175
 
 CMD ["nginx", "-g", "daemon off;"]

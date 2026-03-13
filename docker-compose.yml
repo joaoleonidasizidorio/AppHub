@@ -4,20 +4,26 @@ services:
   backend:
     build: ./backend
     container_name: apphub-backend
-    ports:
-      - "5002:5002"
     volumes:
       - ./backend/uploads:/app/uploads
+      - ./backend/data:/app/data
     restart: always
+    networks:
+      - apple_academy_manager_default
 
   frontend:
     build: ./frontend
     container_name: apphub-frontend
-    ports:
-      - "5175:80"
     depends_on:
       - backend
     restart: always
+    networks:
+      - apple_academy_manager_default
 
 volumes:
   uploads_data:
+
+
+networks:
+  apple_academy_manager_default:
+    external: true

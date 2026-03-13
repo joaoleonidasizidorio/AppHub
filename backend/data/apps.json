@@ -1,0 +1,93 @@
+[
+  {
+    "id": 2,
+    "name": "OmniDiskSweeper",
+    "category": "Utilitários",
+    "version": [
+      "1.16",
+      "1.16"
+    ],
+    "description": "",
+    "icon": "/uploads/1773412806440-OmniDiskSweeper_30178.jpeg",
+    "downloadUrl": "/uploads/1773412806315-OmniDiskSweeper-1.16.dmg",
+    "fileSize": "8.05MB"
+  },
+  {
+    "id": 3,
+    "name": "Swift Playground",
+    "category": "Desenvolvimento",
+    "version": [
+      "4.6",
+      "4.6"
+    ],
+    "description": "",
+    "icon": "/uploads/1773412895222-1200x630bb.png",
+    "downloadUrl": "/uploads/1770235845004-SwiftPlayground.dmg",
+    "fileSize": "850.29MB"
+  },
+  {
+    "id": 5,
+    "name": "Keynote Creator Studio 15.1.1",
+    "category": "Office",
+    "version": [
+      "15.1.1",
+      "15.1.1"
+    ],
+    "description": "",
+    "icon": "/uploads/1773412944331-keynote.png",
+    "downloadUrl": "/uploads/1770918084821-Keynote-15.1.1.dmg",
+    "fileSize": "564.59MB"
+  },
+  {
+    "id": 6,
+    "name": "Figma",
+    "category": "Design",
+    "version": [
+      "1.0.0",
+      "1.0.0"
+    ],
+    "description": "",
+    "icon": "/uploads/1773412999474-images.png",
+    "downloadUrl": "/uploads/1772815391494-Figma.dmg",
+    "fileSize": "1.93MB"
+  },
+  {
+    "id": 7,
+    "name": "Xcode",
+    "category": "Desenvolvimento",
+    "version": [
+      "26.3",
+      "26.3"
+    ],
+    "description": "",
+    "icon": "/uploads/1773413119789-png-transparent-xcode-macos-bigsur-icon.png",
+    "downloadUrl": "/uploads/1772821798823-Xcode_26.3.dmg",
+    "fileSize": "4204.43MB"
+  },
+  {
+    "id": 8,
+    "name": "Brave",
+    "category": "Navegador",
+    "version": [
+      "1.0.0",
+      "1.0.0"
+    ],
+    "description": "",
+    "icon": "/uploads/1773413525103-brave-web-browser.jpg",
+    "downloadUrl": "/uploads/1773413499585-Brave-Browser.dmg",
+    "fileSize": "234.84MB"
+  },
+  {
+    "id": 9,
+    "name": "Google Chrome",
+    "category": "Navegador",
+    "version": [
+      "1.0.0",
+      "1.0.0"
+    ],
+    "description": "",
+    "icon": "/uploads/1773413681955-Google_Chrome_icon_(2011).png",
+    "downloadUrl": "/uploads/1773413679891-googlechrome-2.dmg",
+    "fileSize": "238.56MB"
+  }
+]
