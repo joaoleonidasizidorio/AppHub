@@ -17,14 +17,21 @@ COPY --from=build-stage /app/dist /usr/share/nginx/html
 
 # Configuração customizada do Nginx para suportar roteamento do React (opcional mas recomendado)
 RUN echo "server { \
-    listen 5175; \
+    listen 80; \
+    client_max_body_size 0; \
+    location /apphub/api/ { \
+        proxy_pass http://apphub-backend:5002/api/; \
+    } \
+    location /apphub/uploads/ { \
+        proxy_pass http://apphub-backend:5002/uploads/; \
+    } \
     location /apphub/ { \
-    alias /usr/share/nginx/html/; \
-    index index.html index.htm; \
-    try_files \$uri \$uri/ /apphub/index.html; \
+        alias /usr/share/nginx/html/; \
+        index index.html index.htm; \
+        try_files \$uri \$uri/ /apphub/index.html; \
     } \
     }" > /etc/nginx/conf.d/default.conf
 
-EXPOSE 5175
+EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]

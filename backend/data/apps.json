@@ -52,19 +52,6 @@
     "fileSize": "1.93MB"
   },
   {
-    "id": 7,
-    "name": "Xcode",
-    "category": "Desenvolvimento",
-    "version": [
-      "26.3",
-      "26.3"
-    ],
-    "description": "",
-    "icon": "/uploads/1773413119789-png-transparent-xcode-macos-bigsur-icon.png",
-    "downloadUrl": "/uploads/1772821798823-Xcode_26.3.dmg",
-    "fileSize": "4204.43MB"
-  },
-  {
     "id": 8,
     "name": "Brave",
     "category": "Navegador",
@@ -89,5 +76,18 @@
     "icon": "/uploads/1773413681955-Google_Chrome_icon_(2011).png",
     "downloadUrl": "/uploads/1773413679891-googlechrome-2.dmg",
     "fileSize": "238.56MB"
+  },
+  {
+    "id": 10,
+    "name": "Xcode",
+    "category": "Desenvolvimento",
+    "version": [
+      "26.6",
+      "26.6"
+    ],
+    "description": "",
+    "icon": "/uploads/1786539953148-xcode.jpeg",
+    "downloadUrl": "/uploads/1786537920014-Xcode_26.6_Universal.xip",
+    "fileSize": "2828.32MB"
   }
 ]

@@ -190,7 +190,20 @@ function App() {
       {/* Sidebar */}
       <aside className="glass-sidebar">
         <div className="logo-section">
-          <Cpu className="text-primary" size={32} />
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M16 2L4 26H11L16 16L21 26H28L16 2Z" fill="url(#paint0_linear)" />
+            <path d="M9 22L16 8L23 22H16H9Z" fill="url(#paint1_linear)" />
+            <defs>
+              <linearGradient id="paint0_linear" x1="16" y1="2" x2="16" y2="26" gradientUnits="userSpaceOnUse">
+                <stop stopColor="#FF5A5F" />
+                <stop offset="1" stopColor="#FF0076" />
+              </linearGradient>
+              <linearGradient id="paint1_linear" x1="16" y1="8" x2="16" y2="22" gradientUnits="userSpaceOnUse">
+                <stop stopColor="#FF9058" />
+                <stop offset="1" stopColor="#590FB7" />
+              </linearGradient>
+            </defs>
+          </svg>
           <h1>AppHub</h1>
         </div>
 
@@ -259,7 +272,75 @@ function App() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.6 }}
+            style={{
+              background: 'linear-gradient(135deg, rgba(255, 90, 95, 0.8), rgba(255, 0, 118, 0.8))',
+              backdropFilter: 'blur(40px)',
+              WebkitBackdropFilter: 'blur(40px)',
+              borderRadius: '24px',
+              padding: '3rem',
+              marginBottom: '3rem',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              boxShadow: '0 20px 40px rgba(255,0,118,0.2), inset 0 1px 1px rgba(255,255,255,0.6)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '2rem',
+              overflow: 'hidden',
+              position: 'relative'
+            }}
+          >
+            <div style={{ flex: 1, zIndex: 1 }}>
+              <h1 style={{ fontSize: '3.2rem', fontWeight: '800', marginBottom: '1rem', color: 'white', lineHeight: '1.2', textShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
+                Eleve sua Criatividade
+              </h1>
+              <p style={{ fontSize: '1.2rem', color: 'rgba(255,255,255,0.9)', marginBottom: '2rem', maxWidth: '500px', lineHeight: '1.5' }}>
+                A ferramenta definitiva para fluxos de trabalho e design perfeitos.
+              </p>
+              <div style={{ display: 'flex', gap: '1rem' }}>
+                <button className="download-btn" style={{ background: '#FF5A5F', color: 'white', padding: '0.8rem 2rem', fontSize: '1.1rem', borderRadius: '12px', boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)', border: '1px solid rgba(255,255,255,0.4)' }}>
+                  Explorar Agora
+                </button>
+                <button className="download-btn" style={{ background: 'rgba(255,255,255,0.2)', color: 'white', padding: '0.8rem 2rem', fontSize: '1.1rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.3)', backdropFilter: 'blur(10px)' }}>
+                  Explorar Recursos
+                </button>
+              </div>
+            </div>
+            
+            <div style={{ flex: 1, display: 'flex', justifyContent: 'center', position: 'relative', height: '220px', zIndex: 1 }}>
+               <div style={{
+                  position: 'absolute', right: '40px', top: '10px', width: '80px', height: '80px',
+                  background: 'linear-gradient(135deg, #FF9058, #FF5A5F)', borderRadius: '20px',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.2), inset 0 2px 2px rgba(255,255,255,0.5)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', transform: 'rotate(-10deg)'
+               }}>
+                 <Brush size={36} color="white" />
+               </div>
+               
+               <div style={{
+                  position: 'absolute', right: '140px', top: '70px', width: '120px', height: '120px',
+                  background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(20px)', borderRadius: '30px', border: '1px solid rgba(255,255,255,0.4)',
+                  boxShadow: '0 20px 40px rgba(0,0,0,0.2), inset 0 2px 2px rgba(255,255,255,0.5)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', transform: 'rotate(5deg)'
+               }}>
+                 <Terminal size={56} color="white" />
+               </div>
+
+               <div style={{
+                  position: 'absolute', right: '60px', top: '120px', width: '60px', height: '60px',
+                  background: 'linear-gradient(135deg, #590FB7, #FF0076)', borderRadius: '16px',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.2), inset 0 2px 2px rgba(255,255,255,0.5)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', transform: 'rotate(15deg)'
+               }}>
+                 <Package size={28} color="white" />
+               </div>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
           >
             <div style={{ marginBottom: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
               <div>
@@ -303,26 +384,26 @@ function App() {
                         v{app.version} • {app.fileSize}
                       </div>
 
-                      <div className="flex gap-2">
+                      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                         {token && (
                           <>
                             <button
                               onClick={() => openEditModal(app)}
-                              style={{ background: 'rgba(255,255,255,0.05)', padding: '8px', borderRadius: '10px', color: '#86868b' }}
+                              style={{ background: 'rgba(255,255,255,0.1)', padding: '8px', borderRadius: '10px', color: '#fff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                               title="Editar"
                             >
                               <Pencil size={16} />
                             </button>
                             <button
                               onClick={() => handleDelete(app.id)}
-                              style={{ background: 'rgba(255,0,0,0.1)', padding: '8px', borderRadius: '10px', color: '#ff453a' }}
+                              style={{ background: 'rgba(255,0,0,0.2)', padding: '8px', borderRadius: '10px', color: '#ff453a', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                               title="Excluir"
                             >
                               <Trash2 size={16} />
                             </button>
                           </>
                         )}
-                        <a href={app.downloadUrl === '#' ? '#' : `${API_BASE}${app.downloadUrl}`} className="download-btn">
+                        <a href={app.downloadUrl === '#' ? '#' : `${API_BASE}${app.downloadUrl}`} className="download-btn" style={{ display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none' }}>
                           <Download size={16} />
                           Obter
                         </a>
