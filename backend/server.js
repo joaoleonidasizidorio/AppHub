@@ -261,7 +261,9 @@ app.get('/api/apps/:id/download', (req, res) => {
         const filename = appItem.downloadUrl.replace('/uploads/', '');
         const filePath = path.join(__dirname, 'uploads', filename);
         if (fs.existsSync(filePath)) {
-            return res.download(filePath, filename);
+            // Remove o prefixo de timestamp para o usuário baixar com o nome limpo (ex: Xcode_27.0.xip)
+            const cleanFilename = filename.replace(/^\d+-/, '');
+            return res.download(filePath, cleanFilename);
         }
         return res.redirect(appItem.downloadUrl);
     }
