@@ -42,16 +42,18 @@ const saveSettings = (data) => {
 /**
  * Envia notificação para o canal configurado (Zoom Chat, WhatsApp, Webhook ou Email)
  */
-const sendNotification = async ({ type, app, customMessage }) => {
-    const settings = loadSettings().notifications || {};
-    if (!settings.enabled) {
+const sendNotification = async ({ type, app, customMessage, overrideSettings }) => {
+    const savedSettings = loadSettings().notifications || {};
+    const settings = overrideSettings ? { ...savedSettings, ...overrideSettings } : savedSettings;
+
+    if (!settings.enabled && type !== 'test') {
         return { sent: false, reason: 'Notificações desativadas' };
     }
     if (settings.provider !== 'email' && !settings.webhookUrl) {
         return { sent: false, reason: 'URL do Webhook não configurada' };
     }
     if (settings.provider === 'email' && (!settings.smtpHost || !settings.smtpUser || !settings.smtpPass || !settings.toEmail)) {
-        return { sent: false, reason: 'Configurações de e-mail incompletas' };
+        return { sent: false, reason: 'Configurações de e-mail incompletas (Servidor, Usuário, Senha e E-mail de Destino são obrigatórios)' };
     }
 
     const appName = app ? app.name : 'AppHub';
@@ -74,14 +76,21 @@ const sendNotification = async ({ type, app, customMessage }) => {
 
     try {
         if (settings.provider === 'email') {
+            const port = Number(settings.smtpPort) || 587;
             const transporter = nodemailer.createTransport({
                 host: settings.smtpHost,
-                port: Number(settings.smtpPort) || 587,
-                secure: Number(settings.smtpPort) === 465,
+                port: port,
+                secure: port === 465,
                 auth: {
                     user: settings.smtpUser,
                     pass: settings.smtpPass
-                }
+                },
+                tls: {
+                    rejectUnauthorized: false
+                },
+                connectionTimeout: 10000,
+                greetingTimeout: 5000,
+                socketTimeout: 10000
             });
 
             await transporter.sendMail({
@@ -89,7 +98,7 @@ const sendNotification = async ({ type, app, customMessage }) => {
                 to: settings.toEmail,
                 subject: title,
                 text: bodyText,
-                html: `<h3>${title}</h3><p>${bodyText.replace(/\n/g, '<br>')}</p>`
+                html: `<div style="font-family: Arial, sans-serif; padding: 20px; color: #333;"><h2 style="color: #007aff;">${title}</h2><p style="font-size: 15px; line-height: 1.5;">${bodyText.replace(/\n/g, '<br>')}</p><hr style="border: none; border-top: 1px solid #eee; margin-top: 20px;"><span style="font-size: 12px; color: #888;">Mensagem enviada por AppHub</span></div>`
             });
         } else if (settings.provider === 'zoom') {
             // Formato compatível com Zoom Chat Incoming Webhook

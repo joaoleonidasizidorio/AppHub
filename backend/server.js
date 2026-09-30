@@ -524,7 +524,8 @@ app.post('/api/settings/notifications/test', authenticateToken, async (req, res)
     try {
         const result = await sendNotification({
             type: 'test',
-            customMessage: req.body.message || 'Teste de conexão enviado com sucesso do AppHub da Apple Developer Academy!'
+            customMessage: req.body?.customMessage || 'Teste de conexão enviado com sucesso do AppHub da Apple Developer Academy!',
+            overrideSettings: req.body
         });
         if (result.sent) {
             res.json({ message: 'Notificação de teste disparada com sucesso!' });

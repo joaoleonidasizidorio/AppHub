@@ -680,7 +680,7 @@ function App() {
     setTestingNotification(true);
     setNotificationTestStatus(null);
     try {
-      const res = await axios.post(`${API_BASE}/api/settings/notifications/test`, {}, {
+      const res = await axios.post(`${API_BASE}/api/settings/notifications/test`, notificationSettings, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNotificationTestStatus({ success: true, message: res.data.message });
@@ -2317,7 +2317,12 @@ function App() {
                         <button
                           type="button"
                           onClick={handleTestNotification}
-                          disabled={testingNotification || !notificationSettings.webhookUrl}
+                          disabled={
+                            testingNotification ||
+                            (notificationSettings.provider === 'email'
+                              ? (!notificationSettings.smtpHost || !notificationSettings.smtpUser || !notificationSettings.smtpPass || !notificationSettings.toEmail)
+                              : !notificationSettings.webhookUrl)
+                          }
                           className="download-btn"
                           style={{
                             background: 'rgba(0,122,255,0.2)', border: '1px solid rgba(0,122,255,0.4)',
