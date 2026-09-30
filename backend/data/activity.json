@@ -1,0 +1,168 @@
+[
+  {
+    "id": 1790756690276,
+    "action": "updated",
+    "appName": "Google Chrome",
+    "appType": "hosted",
+    "details": "Atualizado pela rotina automática",
+    "timestamp": "2026-09-30T08:24:50.276Z"
+  },
+  {
+    "id": 1790605293984,
+    "action": "updated",
+    "appName": "Xcode",
+    "appType": "hosted",
+    "details": "",
+    "timestamp": "2026-09-28T14:21:33.984Z"
+  },
+  {
+    "id": 1790605269020,
+    "action": "updated",
+    "appName": "Google Chrome",
+    "appType": "hosted",
+    "details": "Atualização automática concluída com sucesso",
+    "timestamp": "2026-09-28T14:21:09.020Z"
+  },
+  {
+    "id": 1790605260391,
+    "action": "updated",
+    "appName": "Google Chrome",
+    "appType": "hosted",
+    "details": "",
+    "timestamp": "2026-09-28T14:21:00.391Z"
+  },
+  {
+    "id": 1790605212778,
+    "action": "updated",
+    "appName": "Brave",
+    "appType": "hosted",
+    "details": "Atualização automática concluída com sucesso",
+    "timestamp": "2026-09-28T14:20:12.778Z"
+  },
+  {
+    "id": 1790605202907,
+    "action": "updated",
+    "appName": "Brave",
+    "appType": "hosted",
+    "details": "",
+    "timestamp": "2026-09-28T14:20:02.907Z"
+  },
+  {
+    "id": 1790605133868,
+    "action": "updated",
+    "appName": "Figma",
+    "appType": "hosted",
+    "details": "Atualização automática concluída com sucesso",
+    "timestamp": "2026-09-28T14:18:53.868Z"
+  },
+  {
+    "id": 1790605127721,
+    "action": "updated",
+    "appName": "Figma",
+    "appType": "hosted",
+    "details": "",
+    "timestamp": "2026-09-28T14:18:47.721Z"
+  },
+  {
+    "id": 1790605096156,
+    "action": "updated",
+    "appName": "Keynote Creator Studio",
+    "appType": "hosted",
+    "details": "",
+    "timestamp": "2026-09-28T14:18:16.156Z"
+  },
+  {
+    "id": 1790605024896,
+    "action": "updated",
+    "appName": "Swift Playground",
+    "appType": "hosted",
+    "details": "",
+    "timestamp": "2026-09-28T14:17:04.896Z"
+  },
+  {
+    "id": 1790604987989,
+    "action": "updated",
+    "appName": "OmniDiskSweeper",
+    "appType": "hosted",
+    "details": "Atualização automática concluída com sucesso",
+    "timestamp": "2026-09-28T14:16:27.989Z"
+  },
+  {
+    "id": 1790604985361,
+    "action": "updated",
+    "appName": "OmniDiskSweeper",
+    "appType": "hosted",
+    "details": "",
+    "timestamp": "2026-09-28T14:16:25.361Z"
+  },
+  {
+    "id": 1790295380398,
+    "action": "updated",
+    "appName": "Brave",
+    "appType": "hosted",
+    "details": "Atualizado pela rotina automática",
+    "timestamp": "2026-09-25T00:16:20.398Z"
+  },
+  {
+    "id": 1790189721478,
+    "action": "updated",
+    "appName": "Google Chrome",
+    "appType": "hosted",
+    "details": "Atualizado automaticamente",
+    "timestamp": "2026-09-23T18:55:21.478Z"
+  },
+  {
+    "id": 1790189712549,
+    "action": "updated",
+    "appName": "Brave",
+    "appType": "hosted",
+    "details": "Atualizado automaticamente",
+    "timestamp": "2026-09-23T18:55:12.549Z"
+  },
+  {
+    "id": 1790189702794,
+    "action": "updated",
+    "appName": "Figma",
+    "appType": "hosted",
+    "details": "Atualizado automaticamente",
+    "timestamp": "2026-09-23T18:55:02.794Z"
+  },
+  {
+    "id": 1790188740963,
+    "action": "updated",
+    "appName": "Xcode",
+    "appType": "hosted",
+    "details": "Erro na atualização: Erro ao verificar fonte: Request failed with status code 404",
+    "timestamp": "2026-09-23T18:39:00.963Z"
+  },
+  {
+    "id": 1790188740739,
+    "action": "updated",
+    "appName": "Xcode",
+    "appType": "hosted",
+    "details": "",
+    "timestamp": "2026-09-23T18:39:00.739Z"
+  },
+  {
+    "id": 1790188439859,
+    "action": "updated",
+    "appName": "OmniDiskSweeper",
+    "appType": "hosted",
+    "details": "Atualização automática concluída com sucesso",
+    "timestamp": "2026-09-23T18:33:59.859Z"
+  },
+  {
+    "id": 1790168731975,
+    "action": "toggled",
+    "appName": "Swift Playground",
+    "appType": "hosted",
+    "timestamp": "2026-09-23T13:05:31.975Z"
+  },
+  {
+    "id": 1790168730940,
+    "action": "toggled",
+    "appName": "Swift Playground",
+    "appType": "hosted",
+    "timestamp": "2026-09-23T13:05:30.940Z"
+  }
+]

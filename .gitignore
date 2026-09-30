@@ -39,3 +39,6 @@ Thumbs.db
 
 # Project specific
 backend/uploads/
+certs/
+.vite/
+

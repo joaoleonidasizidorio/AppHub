@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1790686638323,
+    "appId": 3,
+    "appName": "Swift Playground",
+    "category": "Desenvolvimento",
+    "platforms": [
+      "macOS",
+      "iPad"
+    ],
+    "fileSize": "850.29MB",
+    "ip": "::ffff:172.20.0.3",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+    "timestamp": "2026-09-29T12:57:18.323Z"
+  },
+  {
+    "id": 1790686631250,
+    "appId": 2,
+    "appName": "OmniDiskSweeper",
+    "category": "Utilitários",
+    "platforms": [
+      "macOS"
+    ],
+    "fileSize": "8.05MB",
+    "ip": "::ffff:172.20.0.3",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+    "timestamp": "2026-09-29T12:57:11.251Z"
+  }
+]

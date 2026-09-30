@@ -1,92 +1,231 @@
 [
   {
+    "type": "hosted",
+    "platforms": [
+      "macOS"
+    ],
+    "available": true,
+    "externalUrl": "",
+    "autoUpdate": true,
+    "updateStrategy": "catalog",
+    "updateUrl": "",
+    "catalogId": "omnidisksweeper",
+    "updatePattern": "",
+    "downloadCount": 39,
+    "screenshots": [
+      "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop&q=80"
+    ],
+    "changelog": "Compatibilidade aprimorada com as últimas versões do macOS e correções na indexação de arquivos ocultos do sistema.",
+    "requirements": "macOS 11 Big Sur ou superior. Suporte nativo para Apple Silicon e Intel.",
+    "appleSiliconCompatible": true,
+    "lastCheckedAt": "2026-09-28T14:16:27.988Z",
+    "lastUpdateStatus": "success",
+    "lastUpdateError": null,
+    "updatedAt": "2026-09-28T14:16:27.988Z",
     "id": 2,
     "name": "OmniDiskSweeper",
     "category": "Utilitários",
-    "version": [
-      "1.16",
-      "1.16"
-    ],
-    "description": "",
-    "icon": "/uploads/1773412806440-OmniDiskSweeper_30178.jpeg",
-    "downloadUrl": "/uploads/1773412806315-OmniDiskSweeper-1.16.dmg",
+    "version": "1.16",
+    "description": "Ferramenta essencial para escanear e liberar espaço em disco no macOS com precisão visual.",
+    "icon": "/uploads/1790604985350-OmniDiskSweeper.jpeg",
+    "downloadUrl": "/uploads/1790604987980-OmniDiskSweeper-1.16.dmg",
     "fileSize": "8.05MB"
   },
   {
+    "type": "hosted",
+    "platforms": [
+      "macOS",
+      "iPad"
+    ],
+    "available": true,
+    "externalUrl": "",
+    "autoUpdate": false,
+    "updateStrategy": "catalog",
+    "updateUrl": "",
+    "catalogId": "",
+    "updatePattern": "",
+    "downloadCount": 95,
+    "screenshots": [
+      "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80"
+    ],
+    "changelog": "Suporte a Swift 5.10, novos templates de SwiftUI para visionOS e melhorias nos previews ao vivo.",
+    "requirements": "macOS 13.5 Ventura ou superior. Otimizado para Apple Silicon.",
+    "appleSiliconCompatible": true,
+    "lastCheckedAt": null,
+    "lastUpdateStatus": "idle",
+    "lastUpdateError": null,
+    "updatedAt": "2026-09-28T14:17:04.894Z",
     "id": 3,
     "name": "Swift Playground",
     "category": "Desenvolvimento",
-    "version": [
-      "4.6",
-      "4.6"
-    ],
-    "description": "",
-    "icon": "/uploads/1773412895222-1200x630bb.png",
+    "version": "4.6",
+    "description": "Ambiente interativo e revolucionário da Apple para aprender e prototipar em Swift e SwiftUI.",
+    "icon": "/uploads/1790605024890-Swift Playground.jpeg",
     "downloadUrl": "/uploads/1770235845004-SwiftPlayground.dmg",
     "fileSize": "850.29MB"
   },
   {
-    "id": 5,
-    "name": "Keynote Creator Studio 15.1.1",
-    "category": "Office",
-    "version": [
-      "15.1.1",
-      "15.1.1"
+    "type": "hosted",
+    "platforms": [
+      "macOS"
     ],
-    "description": "",
-    "icon": "/uploads/1773412944331-keynote.png",
+    "available": true,
+    "externalUrl": "",
+    "autoUpdate": false,
+    "updateStrategy": "catalog",
+    "updateUrl": "",
+    "catalogId": "",
+    "updatePattern": "",
+    "downloadCount": 52,
+    "screenshots": [
+      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80"
+    ],
+    "changelog": "Novas transições de Magic Move, suporte a exportação ProRes e colaboração em tempo real otimizada.",
+    "requirements": "macOS 13.0 ou posterior.",
+    "appleSiliconCompatible": true,
+    "lastCheckedAt": null,
+    "lastUpdateStatus": "idle",
+    "lastUpdateError": null,
+    "updatedAt": "2026-09-28T14:18:16.153Z",
+    "id": 5,
+    "name": "Keynote Creator Studio",
+    "category": "Office",
+    "version": "15.1.1",
+    "description": "Suíte poderosa para criação de apresentações cinematográficas e pitch decks de alta fidelidade.",
+    "icon": "/uploads/1790605096148-Keynote Creator Studio.jpeg",
     "downloadUrl": "/uploads/1770918084821-Keynote-15.1.1.dmg",
     "fileSize": "564.59MB"
   },
   {
+    "type": "hosted",
+    "platforms": [
+      "macOS",
+      "Windows"
+    ],
+    "available": true,
+    "externalUrl": "",
+    "autoUpdate": true,
+    "updateStrategy": "catalog",
+    "updateUrl": "",
+    "catalogId": "figma",
+    "updatePattern": "",
+    "downloadCount": 142,
+    "screenshots": [
+      "https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=800&auto=format&fit=crop&q=80"
+    ],
+    "changelog": "Melhorias no Dev Mode, suporte a variáveis avançadas e renderização acelerada por GPU Metal.",
+    "requirements": "macOS 12.0 Monterey ou Windows 10/11 64-bit.",
+    "appleSiliconCompatible": true,
+    "lastCheckedAt": "2026-09-28T14:18:53.867Z",
+    "lastUpdateStatus": "success",
+    "lastUpdateError": null,
+    "updatedAt": "2026-09-28T14:18:53.867Z",
     "id": 6,
     "name": "Figma",
     "category": "Design",
-    "version": [
-      "1.0.0",
-      "1.0.0"
-    ],
-    "description": "",
-    "icon": "/uploads/1773412999474-images.png",
-    "downloadUrl": "/uploads/1772815391494-Figma.dmg",
-    "fileSize": "1.93MB"
+    "version": "126.8.18",
+    "description": "A principal plataforma colaborativa de design de interface e design systems da indústria.",
+    "icon": "/uploads/1790605127716-Figma.jpeg",
+    "downloadUrl": "/uploads/1790605133866-Figma-126.8.18.zip",
+    "fileSize": "123.66MB"
   },
   {
+    "type": "hosted",
+    "platforms": [
+      "macOS",
+      "Windows",
+      "Linux"
+    ],
+    "available": true,
+    "externalUrl": "",
+    "autoUpdate": true,
+    "updateStrategy": "catalog",
+    "updateUrl": "",
+    "catalogId": "brave-browser",
+    "updatePattern": "",
+    "downloadCount": 87,
+    "screenshots": [
+      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=80"
+    ],
+    "changelog": "Chromium 124, correções de segurança no motor V8 e melhorias no consumo de bateria no MacBook.",
+    "requirements": "macOS 11 Big Sur ou superior (Binário Universal / Apple Silicon).",
+    "appleSiliconCompatible": true,
+    "lastCheckedAt": "2026-09-28T14:20:12.777Z",
+    "lastUpdateStatus": "success",
+    "lastUpdateError": null,
+    "updatedAt": "2026-09-28T14:20:12.777Z",
     "id": 8,
     "name": "Brave",
     "category": "Navegador",
-    "version": [
-      "1.0.0",
-      "1.0.0"
-    ],
-    "description": "",
-    "icon": "/uploads/1773413525103-brave-web-browser.jpg",
-    "downloadUrl": "/uploads/1773413499585-Brave-Browser.dmg",
-    "fileSize": "234.84MB"
+    "version": "1.96.59.0",
+    "description": "Navegador de alta performance com privacidade absoluta, bloqueio nativo de telemetria e anúncios.",
+    "icon": "/uploads/1790605202902-Brave.jpeg",
+    "downloadUrl": "/uploads/1790605212776-Brave-Browser-arm64.dmg",
+    "fileSize": "217.95MB"
   },
   {
+    "type": "hosted",
+    "platforms": [
+      "macOS",
+      "Windows",
+      "Linux"
+    ],
+    "available": true,
+    "externalUrl": "",
+    "autoUpdate": true,
+    "updateStrategy": "catalog",
+    "updateUrl": "",
+    "catalogId": "google-chrome",
+    "updatePattern": "",
+    "downloadCount": 165,
+    "screenshots": [
+      "https://images.unsplash.com/photo-1542744094-3a31f272c490?w=800&auto=format&fit=crop&q=80"
+    ],
+    "changelog": "Suporte a WebAssembly GC, otimização no renderizador Blink e proteção avançada de navegação.",
+    "requirements": "macOS 11.0 ou superior (Universal 64-bit).",
+    "appleSiliconCompatible": true,
+    "lastCheckedAt": "2026-09-30T08:24:50.272Z",
+    "lastUpdateStatus": "success",
+    "lastUpdateError": null,
+    "updatedAt": "2026-09-30T08:24:50.272Z",
     "id": 9,
     "name": "Google Chrome",
     "category": "Navegador",
-    "version": [
-      "1.0.0",
-      "1.0.0"
-    ],
-    "description": "",
-    "icon": "/uploads/1773413681955-Google_Chrome_icon_(2011).png",
-    "downloadUrl": "/uploads/1773413679891-googlechrome-2.dmg",
-    "fileSize": "238.56MB"
+    "version": "154.0.8037.93",
+    "description": "Navegador web rápido, seguro e com ferramentas de desenvolvimento Chrome DevTools líderes do setor.",
+    "icon": "/uploads/1790605260385-Google Chrome.jpeg",
+    "downloadUrl": "/uploads/1790756690264-googlechrome.dmg",
+    "fileSize": "269.71MB"
   },
   {
+    "type": "hosted",
+    "platforms": [
+      "macOS"
+    ],
+    "available": true,
+    "externalUrl": "",
+    "autoUpdate": false,
+    "updateStrategy": "catalog",
+    "updateUrl": "",
+    "catalogId": "",
+    "updatePattern": "",
+    "downloadCount": 210,
+    "screenshots": [
+      "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=80"
+    ],
+    "changelog": "SDKs do iOS 18, macOS 15, watchOS 11 e visionOS 2. Compilador Swift 6 com data-race safety garantido.",
+    "requirements": "macOS 14.5 Sonoma ou macOS 15 Sequoia. Requer chip Apple Silicon.",
+    "appleSiliconCompatible": true,
+    "lastCheckedAt": null,
+    "lastUpdateStatus": "idle",
+    "lastUpdateError": null,
+    "updatedAt": "2026-09-28T14:21:33.983Z",
     "id": 10,
     "name": "Xcode",
     "category": "Desenvolvimento",
-    "version": [
-      "26.6",
-      "26.6"
-    ],
-    "description": "",
-    "icon": "/uploads/1786539953148-xcode.jpeg",
+    "version": "26.6",
+    "description": "A suíte completa de desenvolvimento da Apple para criar apps para iOS, iPadOS, macOS, watchOS e visionOS.",
+    "icon": "/uploads/1790605293979-Xcode.jpeg",
     "downloadUrl": "/uploads/1786537920014-Xcode_26.6_Universal.xip",
     "fileSize": "2828.32MB"
   }
