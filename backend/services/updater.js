@@ -205,6 +205,30 @@ const checkWebScrapeUpdate = async (pageUrl, customPattern) => {
         }
     });
 
+    // Suporte especial inteligente para XcodeReleases.com (Filtra apenas versões finais / Release, descartando betas)
+    if (pageUrl.includes('xcodereleases.com')) {
+        try {
+            const dataUrl = 'https://xcodereleases.com/data.json';
+            const jsonRes = await axios.get(dataUrl, { timeout: 15000 });
+            const data = jsonRes.data;
+            if (Array.isArray(data)) {
+                const latestRelease = data.find(x => x.name === 'Xcode' && x.version?.release?.release === true);
+                if (latestRelease) {
+                    const remoteVersion = latestRelease.version?.number || null;
+                    const downloadUrl = latestRelease.links?.download?.url || '';
+                    const suggestedName = `Xcode_${remoteVersion || 'Latest'}.xip`;
+                    return {
+                        remoteVersion,
+                        downloadUrl,
+                        suggestedName
+                    };
+                }
+            }
+        } catch (e) {
+            console.error('[Updater] Erro ao consultar XcodeReleases:', e.message);
+        }
+    }
+
     const html = res.data;
     if (typeof html !== 'string') throw new Error('Conteúdo da página não é texto');
 
@@ -213,11 +237,11 @@ const checkWebScrapeUpdate = async (pageUrl, customPattern) => {
         try {
             pattern = new RegExp(customPattern, 'i');
         } catch (e) {
-            pattern = /(https?:\/\/[^\s"'<>]+\.(?:dmg|pkg|exe|zip))/i;
+            pattern = /(https?:\/\/[^\s"'<>]+\.(?:dmg|pkg|exe|zip|xip))/i;
         }
     } else {
-        // Padrão inteligente que busca links de instalador
-        pattern = /(?:href=["'])((?:https?:\/\/[^\s"'<>]+|\/[^\s"'<>]+)\.(?:dmg|pkg|exe|zip))["']/i;
+        // Padrão inteligente que busca links de instalador (.dmg, .pkg, .xip, .exe, .zip)
+        pattern = /(?:href=["'])((?:https?:\/\/[^\s"'<>]+|\/[^\s"'<>]+)\.(?:dmg|pkg|exe|zip|xip))["']/i;
     }
 
     const match = html.match(pattern);
