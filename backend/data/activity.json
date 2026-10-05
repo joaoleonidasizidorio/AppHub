@@ -1,5 +1,37 @@
 [
   {
+    "id": 1790987526848,
+    "action": "updated",
+    "appName": "Brave",
+    "appType": "hosted",
+    "details": "Atualizado pela rotina automática",
+    "timestamp": "2026-10-03T00:32:06.848Z"
+  },
+  {
+    "id": 1790965930015,
+    "action": "updated",
+    "appName": "Google Chrome",
+    "appType": "hosted",
+    "details": "Atualizado pela rotina automática",
+    "timestamp": "2026-10-02T18:32:10.015Z"
+  },
+  {
+    "id": 1790931584016,
+    "action": "updated",
+    "appName": "Figma",
+    "appType": "hosted",
+    "details": "Atualizado pela rotina automática",
+    "timestamp": "2026-10-02T08:59:44.016Z"
+  },
+  {
+    "id": 1790821494923,
+    "action": "updated",
+    "appName": "Brave",
+    "appType": "hosted",
+    "details": "Atualizado pela rotina automática",
+    "timestamp": "2026-10-01T02:24:54.923Z"
+  },
+  {
     "id": 1790756690276,
     "action": "updated",
     "appName": "Google Chrome",

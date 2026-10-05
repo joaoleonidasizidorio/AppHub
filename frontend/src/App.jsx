@@ -9,6 +9,7 @@ import {
   Image, MessageSquare, Send, Award, TrendingUp, Layers, Compass, Share2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { translations } from './i18n';
 
 const API_BASE = '/apphub';
 
@@ -21,35 +22,36 @@ const PLATFORM_CONFIG = {
 };
 
 const TYPE_CONFIG = {
-  hosted: { label: 'Hospedado', color: '#ff9f0a', bg: 'rgba(255,159,10,0.15)' },
-  linked: { label: 'Link Externo', color: '#30d158', bg: 'rgba(48,209,88,0.15)' },
-  file:   { label: 'Arquivo',    color: '#64d2ff', bg: 'rgba(100,210,255,0.15)' },
+  hosted: { color: '#ff9f0a', bg: 'rgba(255,159,10,0.15)' },
+  linked: { color: '#30d158', bg: 'rgba(48,209,88,0.15)' },
+  file:   { color: '#64d2ff', bg: 'rgba(100,210,255,0.15)' },
 };
 
 const STRATEGY_CONFIG = {
-  catalog:    { label: 'Catálogo / Cask Oficial', color: '#af52de', icon: <Sparkles size={12} /> },
-  direct_url: { label: 'Link Direto (Latest)',   color: '#007aff', icon: <Globe size={12} /> },
-  web_scrape: { label: 'Página Web (Scraper)',   color: '#ff9f0a', icon: <Search size={12} /> },
-  github:     { label: 'GitHub Releases',        color: '#34c759', icon: <ArrowUpRight size={12} /> },
+  catalog:    { color: '#af52de', icon: <Sparkles size={12} /> },
+  direct_url: { color: '#007aff', icon: <Globe size={12} /> },
+  web_scrape: { color: '#ff9f0a', icon: <Search size={12} /> },
+  github:     { color: '#34c759', icon: <ArrowUpRight size={12} /> },
 };
 
 const STATUS_CONFIG = {
-  available:   { label: 'Disponível',    color: '#30d158', icon: <CheckCircle size={12} /> },
-  unavailable: { label: 'Indisponível',  color: '#ff453a', icon: <XCircle size={12} /> },
+  available:   { color: '#30d158', icon: <CheckCircle size={12} /> },
+  unavailable: { color: '#ff453a', icon: <XCircle size={12} /> },
 };
 
-const ACTION_LABELS = {
-  added:        { label: 'Adicionado',         color: '#30d158' },
-  updated:      { label: 'Atualizado',         color: '#ff9f0a' },
-  deleted:      { label: 'Removido',           color: '#ff453a' },
-  toggled:      { label: 'Status alterado',    color: '#64d2ff' },
-  auto_updated: { label: 'Auto-atualizado',    color: '#af52de' }
+const ACTION_LABELS_KEYS = {
+  added:        { key: 'actionAdded',       color: '#30d158' },
+  updated:      { key: 'actionUpdated',     color: '#ff9f0a' },
+  deleted:      { key: 'actionDeleted',     color: '#ff453a' },
+  toggled:      { key: 'actionToggled',     color: '#64d2ff' },
+  auto_updated: { key: 'actionAutoUpdated', color: '#af52de' }
 };
 
-function formatDate(iso) {
+function formatDate(iso, lang = 'pt') {
   if (!iso) return '—';
   const d = new Date(iso);
-  return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  const locale = lang === 'en' ? 'en-US' : 'pt-BR';
+  return d.toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
 function PlatformBadge({ platform }) {
@@ -66,25 +68,79 @@ function PlatformBadge({ platform }) {
   );
 }
 
-function TypeBadge({ type }) {
+function TypeBadge({ type, lang = 'pt' }) {
   const cfg = TYPE_CONFIG[type] || TYPE_CONFIG.hosted;
+  const labels = {
+    pt: { hosted: 'Hospedado', linked: 'Link Externo', file: 'Arquivo' },
+    en: { hosted: 'Hosted', linked: 'External Link', file: 'File' }
+  };
+  const label = labels[lang]?.[type] || cfg.label;
   return (
     <span style={{
       fontSize: '0.7rem', fontWeight: '600', padding: '2px 8px',
       borderRadius: '6px', color: cfg.color, background: cfg.bg,
       border: `1px solid ${cfg.color}33`
     }}>
-      {cfg.label}
+      {label}
     </span>
   );
 }
 
-function StatusDot({ available }) {
+function StatusDot({ available, lang = 'pt' }) {
   const cfg = available ? STATUS_CONFIG.available : STATUS_CONFIG.unavailable;
+  const label = available ? (lang === 'en' ? 'Available' : 'Disponível') : (lang === 'en' ? 'Unavailable' : 'Indisponível');
   return (
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: cfg.color }}>
-      {cfg.icon} {cfg.label}
+      {cfg.icon} {label}
     </span>
+  );
+}
+
+function LanguageSelector({ lang, setLang }) {
+  const toggle = (l) => {
+    setLang(l);
+    localStorage.setItem('apphub_lang', l);
+  };
+  return (
+    <div style={{
+      display: 'inline-flex', alignItems: 'center',
+      background: 'rgba(255, 255, 255, 0.06)',
+      backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+      border: '1px solid rgba(255, 255, 255, 0.15)',
+      borderRadius: '20px', padding: '3px', gap: '2px',
+      boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+    }}>
+      <button
+        type="button"
+        onClick={() => toggle('pt')}
+        title="Português (Brasil)"
+        style={{
+          display: 'flex', alignItems: 'center', gap: '5px', border: 'none',
+          padding: '4px 10px', borderRadius: '16px', fontSize: '0.72rem', fontWeight: '700',
+          cursor: 'pointer', transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+          background: lang === 'pt' ? 'linear-gradient(135deg, #007aff, #5856d6)' : 'transparent',
+          color: lang === 'pt' ? '#ffffff' : '#86868b',
+          boxShadow: lang === 'pt' ? '0 2px 8px rgba(0, 122, 255, 0.35)' : 'none'
+        }}
+      >
+        <span style={{ fontSize: '0.85rem' }}>🇧🇷</span> PT
+      </button>
+      <button
+        type="button"
+        onClick={() => toggle('en')}
+        title="English (US)"
+        style={{
+          display: 'flex', alignItems: 'center', gap: '5px', border: 'none',
+          padding: '4px 10px', borderRadius: '16px', fontSize: '0.72rem', fontWeight: '700',
+          cursor: 'pointer', transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+          background: lang === 'en' ? 'linear-gradient(135deg, #007aff, #5856d6)' : 'transparent',
+          color: lang === 'en' ? '#ffffff' : '#86868b',
+          boxShadow: lang === 'en' ? '0 2px 8px rgba(0, 122, 255, 0.35)' : 'none'
+        }}
+      >
+        <span style={{ fontSize: '0.85rem' }}>🇺🇸</span> EN
+      </button>
+    </div>
   );
 }
 
@@ -144,7 +200,7 @@ function PlatformPicker({ selected, onChange }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 // MonitorDashboard — componente com gráficos Chart.js reais
 // ═══════════════════════════════════════════════════════════════════════════════
-function MonitorDashboard({ monitorData, apps, API_BASE }) {
+function MonitorDashboard({ monitorData, apps, API_BASE, t, lang = 'pt' }) {
   const barRef = useRef(null);
   const donutRef = useRef(null);
   const lineRef = useRef(null);
@@ -159,10 +215,11 @@ function MonitorDashboard({ monitorData, apps, API_BASE }) {
   // Gerar dados de linha simulados (últimos 6 meses) baseado no total de downloads
   const monthLabels = (() => {
     const months = [];
+    const locale = lang === 'en' ? 'en-US' : 'pt-BR';
     for (let i = 5; i >= 0; i--) {
       const d = new Date();
       d.setMonth(d.getMonth() - i);
-      months.push(d.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' }));
+      months.push(d.toLocaleDateString(locale, { month: 'short', year: '2-digit' }));
     }
     return months;
   })();
@@ -340,13 +397,13 @@ function MonitorDashboard({ monitorData, apps, API_BASE }) {
       if (donutChart.current) { donutChart.current.destroy(); donutChart.current = null; }
       if (lineChart.current) { lineChart.current.destroy(); lineChart.current = null; }
     };
-  }, [monitorData]);
+  }, [monitorData, lang]);
 
   const metricCards = [
-    { icon: <Download size={22} />, value: stats.totalDownloads ?? 0, label: 'Total de Downloads', color: '#30d158', gradient: 'rgba(48,209,88,0.15)' },
-    { icon: <HardDrive size={22} />, value: `${stats.totalBandwidthGB ?? 0} GB`, label: 'Banda Local Servida', color: '#007aff', gradient: 'rgba(0,122,255,0.15)' },
-    { icon: <Zap size={22} />, value: stats.autoUpdateEnabled ?? 0, label: 'Apps com Auto-Update', color: '#af52de', gradient: 'rgba(175,82,222,0.15)' },
-    { icon: <Package size={22} />, value: stats.total ?? 0, label: 'Itens no Catálogo', color: '#ff9f0a', gradient: 'rgba(255,159,10,0.15)' },
+    { icon: <Download size={22} />, value: stats.totalDownloads ?? 0, label: t('totalDownloads'), color: '#30d158', gradient: 'rgba(48,209,88,0.15)' },
+    { icon: <HardDrive size={22} />, value: `${stats.totalBandwidthGB ?? 0} GB`, label: t('servedBandwidth'), color: '#007aff', gradient: 'rgba(0,122,255,0.15)' },
+    { icon: <Zap size={22} />, value: stats.autoUpdateEnabled ?? 0, label: t('autoUpdateRobot'), color: '#af52de', gradient: 'rgba(175,82,222,0.15)' },
+    { icon: <Package size={22} />, value: stats.total ?? 0, label: t('monitoredApps'), color: '#ff9f0a', gradient: 'rgba(255,159,10,0.15)' },
   ];
 
   const card = (style) => ({
@@ -381,14 +438,14 @@ function MonitorDashboard({ monitorData, apps, API_BASE }) {
         <div style={card({})}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '700', fontSize: '1.05rem', marginBottom: '1.2rem' }}>
             <Award size={18} color="#FFD700" />
-            <span>Top 5 Aplicativos Mais Baixados</span>
+            <span>{t('topDownloaded')}</span>
           </div>
           {topApps.length > 0 ? (
             <div style={{ height: '220px' }}>
               <canvas ref={barRef} />
             </div>
           ) : (
-            <p style={{ color: '#86868b', fontSize: '0.9rem' }}>Nenhum download registrado ainda.</p>
+            <p style={{ color: '#86868b', fontSize: '0.9rem' }}>{t('noDownloadsYet')}</p>
           )}
         </div>
 
@@ -396,7 +453,7 @@ function MonitorDashboard({ monitorData, apps, API_BASE }) {
         <div style={card({})}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '700', fontSize: '1.05rem', marginBottom: '1.2rem' }}>
             <Layers size={18} color="#007aff" />
-            <span>Distribuição por Plataforma</span>
+            <span>{t('distributionByPlatform')}</span>
           </div>
           <div style={{ height: '220px' }}>
             <canvas ref={donutRef} />
@@ -409,9 +466,9 @@ function MonitorDashboard({ monitorData, apps, API_BASE }) {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.2rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '700', fontSize: '1.05rem' }}>
             <TrendingUp size={18} color="#30d158" />
-            <span>Tendência de Downloads — Últimos 6 Meses</span>
+            <span>{t('downloadTrend')}</span>
           </div>
-          <span style={{ fontSize: '0.8rem', color: '#86868b' }}>Total acumulado</span>
+          <span style={{ fontSize: '0.8rem', color: '#86868b' }}>{t('totalAccumulated')}</span>
         </div>
         <div style={{ height: '200px' }}>
           <canvas ref={lineRef} />
@@ -424,6 +481,9 @@ function MonitorDashboard({ monitorData, apps, API_BASE }) {
 
 // ═══════════════════════════════════════════════════════════════════════════════
 function App() {
+  const [lang, setLang] = useState(() => localStorage.getItem('apphub_lang') || 'pt');
+  const t = (key) => translations[lang]?.[key] || translations.pt[key] || key;
+
   const [apps, setApps] = useState([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -632,14 +692,14 @@ function App() {
     try {
       setUpdateStatuses(prev => ({
         ...prev,
-        [appId]: { status: 'checking', message: 'Iniciando verificação...' }
+        [appId]: { status: 'checking', message: t('startingCheck') }
       }));
       await axios.post(`${API_BASE}/api/apps/${appId}/check-update`, { force }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchUpdateStatuses();
     } catch (e) {
-      alert(e.response?.data?.message || 'Erro ao verificar atualização');
+      alert(e.response?.data?.message || t('updateCheckError'));
     }
   };
 
@@ -657,7 +717,7 @@ function App() {
       fetchUpdateStatuses();
       if (activeView === 'monitor') fetchMonitor();
     } catch (e) {
-      alert(e.response?.data?.message || 'Erro ao verificar atualizações');
+      alert(e.response?.data?.message || t('updateCheckAllError'));
     } finally {
       setCheckingAll(false);
     }
@@ -670,9 +730,9 @@ function App() {
       await axios.post(`${API_BASE}/api/settings/notifications`, notificationSettings, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      alert('Configurações de notificação salvas com sucesso!');
+      alert(t('notifSavedSuccess'));
     } catch (e) {
-      alert('Erro ao salvar configurações de notificação');
+      alert(t('notifSaveError'));
     }
   };
 
@@ -685,7 +745,7 @@ function App() {
       });
       setNotificationTestStatus({ success: true, message: res.data.message });
     } catch (e) {
-      setNotificationTestStatus({ success: false, message: e.response?.data?.message || 'Falha ao enviar notificação de teste' });
+      setNotificationTestStatus({ success: false, message: e.response?.data?.message || t('notifTestFail') });
     } finally {
       setTestingNotification(false);
     }
@@ -700,7 +760,7 @@ function App() {
       setToken(t);
       localStorage.setItem('apphub_token', t);
       setIsLoginOpen(false);
-    } catch { alert('Usuário ou senha inválidos'); }
+    } catch { alert(t('loginError')); }
   };
 
   const handleLogout = () => {
@@ -712,31 +772,31 @@ function App() {
   const handleChangePassword = async (e) => {
     e.preventDefault();
     if (changePasswordForm.newPassword !== changePasswordForm.confirmPassword)
-      return alert('As novas senhas não coincidem');
+      return alert(t('passwordMismatch'));
     try {
       await axios.put(`${API_BASE}/api/admin/change-password`,
         { currentPassword: changePasswordForm.currentPassword, newPassword: changePasswordForm.newPassword },
         { headers: { Authorization: `Bearer ${token}` } });
-      alert('Senha alterada com sucesso!');
+      alert(t('passwordChanged'));
       setIsSettingsOpen(false);
       setChangePasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
-    } catch (e) { alert(e.response?.data?.message || 'Erro ao alterar senha'); }
+    } catch (e) { alert(e.response?.data?.message || t('passwordChangeError')); }
   };
 
   // ── CRUD Apps ────────────────────────────────────────────────────────────────
   const handleDelete = async (id) => {
-    if (!window.confirm('Confirma exclusão deste item?')) return;
+    if (!window.confirm(t('confirmDelete'))) return;
     try {
       await axios.delete(`${API_BASE}/api/apps/${id}`, { headers: { Authorization: `Bearer ${token}` } });
       fetchApps();
-    } catch { alert('Erro ao excluir'); }
+    } catch { alert(t('deleteError')); }
   };
 
   const handleToggleAvailable = async (app) => {
     try {
       await axios.patch(`${API_BASE}/api/apps/${app.id}/toggle`, {}, { headers: { Authorization: `Bearer ${token}` } });
       fetchApps();
-    } catch { alert('Erro ao alterar status'); }
+    } catch { alert(t('toggleError')); }
   };
 
   const openEditModal = (app) => {
@@ -789,7 +849,7 @@ function App() {
   const handleUpload = async (e) => {
     e.preventDefault();
     if (newApp.type === 'hosted' && !selectedFile && !editingApp && !newApp.autoUpdate)
-      return alert('Selecione um arquivo para upload ou ative a Atualização Automática.');
+      return alert(t('formSelectFileOrAutoUpdate'));
 
     setUploading(true);
     const formData = new FormData();
@@ -836,8 +896,8 @@ function App() {
       fetchApps();
     } catch (e) {
       if (e.response?.status === 401 || e.response?.status === 403) {
-        alert('Sessão expirada. Faça login novamente.'); handleLogout();
-      } else { alert('Erro na operação'); }
+        alert(t('sessionExpired')); handleLogout();
+      } else { alert(t('operationError')); }
     } finally { setUploading(false); }
   };
 
@@ -853,26 +913,31 @@ function App() {
       setIsLocationModalOpen(false); setEditingLocation(null);
       setNewLocation({ name: '', description: '', icon: '🏢' });
       fetchLocations();
-    } catch { alert('Erro ao salvar local'); }
+    } catch { alert(t('locationSaveError')); }
   };
 
   const handleDeleteLocation = async (id) => {
-    if (!window.confirm('Confirma exclusão deste local?')) return;
+    if (!window.confirm(t('confirmDeleteLocation'))) return;
     try {
       await axios.delete(`${API_BASE}/api/locations/${id}`, { headers: { Authorization: `Bearer ${token}` } });
       fetchLocations();
-    } catch { alert('Erro ao excluir local'); }
+    } catch { alert(t('locationDeleteError')); }
   };
 
   // ── Filters & Spotlight Search ────────────────────────────────────────────────
+  const categoryLabels = {
+    pt: { Todos: 'Todos', Utilitários: 'Utilitários', Desenvolvimento: 'Desenvolvimento', Design: 'Design', Navegador: 'Navegador', Office: 'Office', Ferramentas: 'Ferramentas' },
+    en: { Todos: 'All', Utilitários: 'Utilities', Desenvolvimento: 'Development', Design: 'Design', Navegador: 'Browser', Office: 'Office', Ferramentas: 'Tools' }
+  };
+
   const categories = [
-    { name: 'Todos', icon: <LayoutGrid size={18} /> },
-    { name: 'Utilitários', icon: <Box size={18} /> },
-    { name: 'Desenvolvimento', icon: <Terminal size={18} /> },
-    { name: 'Design', icon: <Brush size={18} /> },
-    { name: 'Navegador', icon: <Globe size={18} /> },
-    { name: 'Office', icon: <Package size={18} /> },
-    { name: 'Ferramentas', icon: <HardDrive size={18} /> },
+    { name: 'Todos', label: categoryLabels[lang]?.['Todos'] || 'Todos', icon: <LayoutGrid size={18} /> },
+    { name: 'Utilitários', label: categoryLabels[lang]?.['Utilitários'] || 'Utilitários', icon: <Box size={18} /> },
+    { name: 'Desenvolvimento', label: categoryLabels[lang]?.['Desenvolvimento'] || 'Desenvolvimento', icon: <Terminal size={18} /> },
+    { name: 'Design', label: categoryLabels[lang]?.['Design'] || 'Design', icon: <Brush size={18} /> },
+    { name: 'Navegador', label: categoryLabels[lang]?.['Navegador'] || 'Navegador', icon: <Globe size={18} /> },
+    { name: 'Office', label: categoryLabels[lang]?.['Office'] || 'Office', icon: <Package size={18} /> },
+    { name: 'Ferramentas', label: categoryLabels[lang]?.['Ferramentas'] || 'Ferramentas', icon: <HardDrive size={18} /> },
   ];
 
   const filteredApps = apps.filter(app => {
@@ -919,46 +984,51 @@ function App() {
     <div className="app-container">
       {/* ── Sidebar ── */}
       <aside className="glass-sidebar">
-        <div className="logo-section">
-          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M16 2L4 26H11L16 16L21 26H28L16 2Z" fill="url(#p0)" />
-            <path d="M9 22L16 8L23 22H16H9Z" fill="url(#p1)" />
-            <defs>
-              <linearGradient id="p0" x1="16" y1="2" x2="16" y2="26" gradientUnits="userSpaceOnUse">
-                <stop stopColor="#FF5A5F" /><stop offset="1" stopColor="#FF0076" />
-              </linearGradient>
-              <linearGradient id="p1" x1="16" y1="8" x2="16" y2="22" gradientUnits="userSpaceOnUse">
-                <stop stopColor="#FF9058" /><stop offset="1" stopColor="#590FB7" />
-              </linearGradient>
-            </defs>
-          </svg>
-          <div>
-            <h1>AppHub</h1>
-            <div style={{ fontSize: '0.5rem', color: 'var(--text-secondary)', fontWeight: '500', letterSpacing: '0.12em', textTransform: 'uppercase', whiteSpace: 'nowrap', opacity: 0.7 }}>Seus apps · Sua rede · Seu acesso</div>
+        <div className="logo-section" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.4rem', width: '100%' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: 0 }}>
+            <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M16 2L4 26H11L16 16L21 26H28L16 2Z" fill="url(#p0)" />
+              <path d="M9 22L16 8L23 22H16H9Z" fill="url(#p1)" />
+              <defs>
+                <linearGradient id="p0" x1="16" y1="2" x2="16" y2="26" gradientUnits="userSpaceOnUse">
+                  <stop stopColor="#FF5A5F" /><stop offset="1" stopColor="#FF0076" />
+                </linearGradient>
+                <linearGradient id="p1" x1="16" y1="8" x2="16" y2="22" gradientUnits="userSpaceOnUse">
+                  <stop stopColor="#FF9058" /><stop offset="1" stopColor="#590FB7" />
+                </linearGradient>
+              </defs>
+            </svg>
+            <div style={{ minWidth: 0 }}>
+              <h1 style={{ fontSize: '1.25rem', lineHeight: 1.1 }}>AppHub</h1>
+              <div style={{ fontSize: '0.48rem', color: 'var(--text-secondary)', fontWeight: '500', letterSpacing: '0.1em', textTransform: 'uppercase', whiteSpace: 'nowrap', opacity: 0.75, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {t('slogan')}
+              </div>
+            </div>
           </div>
+          <LanguageSelector lang={lang} setLang={setLang} />
         </div>
 
         <nav className="nav-links">
-          <div style={{ fontSize: '0.65rem', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '0 0.5rem', marginBottom: '0.3rem' }}>Conteúdo</div>
+          <div style={{ fontSize: '0.65rem', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '0 0.5rem', marginBottom: '0.3rem' }}>{t('navContent')}</div>
 
           <div className={`nav-item ${activeView === 'apps' && contentTab === 'apps' ? 'active' : ''}`}
             onClick={() => { setActiveView('apps'); setContentTab('apps'); }}>
-            <Package size={18} /><span>Apps</span>
+            <Package size={18} /><span>{t('navApps')}</span>
             {appCount > 0 && <span style={{ marginLeft: 'auto', fontSize: '0.7rem', background: 'rgba(255,255,255,0.1)', padding: '1px 7px', borderRadius: '10px' }}>{appCount}</span>}
           </div>
 
           <div className={`nav-item ${activeView === 'apps' && contentTab === 'files' ? 'active' : ''}`}
             onClick={() => { setActiveView('apps'); setContentTab('files'); }}>
-            <FileText size={18} /><span>Arquivos</span>
+            <FileText size={18} /><span>{t('navFiles')}</span>
             {fileCount > 0 && <span style={{ marginLeft: 'auto', fontSize: '0.7rem', background: 'rgba(255,255,255,0.1)', padding: '1px 7px', borderRadius: '10px' }}>{fileCount}</span>}
           </div>
 
           <div style={{ height: '1px', background: 'var(--glass-border)', margin: '0.8rem 0' }} />
-          <div style={{ fontSize: '0.65rem', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '0 0.5rem', marginBottom: '0.3rem' }}>Gestão</div>
+          <div style={{ fontSize: '0.65rem', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '0 0.5rem', marginBottom: '0.3rem' }}>{t('navManagement')}</div>
 
           <div className={`nav-item ${activeView === 'monitor' ? 'active' : ''}`}
             onClick={() => setActiveView('monitor')}>
-            <Monitor size={18} /><span>Monitor & Métricas</span>
+            <Monitor size={18} /><span>{t('navMonitor')}</span>
             {autoUpdateCount > 0 && (
               <span style={{ marginLeft: 'auto', fontSize: '0.65rem', background: 'rgba(175,82,222,0.3)', color: '#d896ff', padding: '1px 6px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '3px' }}>
                 <Zap size={9} /> {autoUpdateCount}
@@ -968,19 +1038,19 @@ function App() {
 
           <div className={`nav-item ${activeView === 'locations' ? 'active' : ''}`}
             onClick={() => setActiveView('locations')}>
-            <MapPin size={18} /><span>Locais / Salas</span>
+            <MapPin size={18} /><span>{t('navLocations')}</span>
           </div>
 
           {/* Categories - only when on apps view */}
           {activeView === 'apps' && contentTab === 'apps' && (
             <>
               <div style={{ height: '1px', background: 'var(--glass-border)', margin: '0.8rem 0' }} />
-              <div style={{ fontSize: '0.65rem', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '0 0.5rem', marginBottom: '0.3rem' }}>Categorias</div>
+              <div style={{ fontSize: '0.65rem', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '0 0.5rem', marginBottom: '0.3rem' }}>{t('navCategories')}</div>
               {categories.map(cat => (
                 <div key={cat.name}
                   className={`nav-item ${selectedCategory === cat.name ? 'active' : ''}`}
                   onClick={() => setSelectedCategory(cat.name)}>
-                  {cat.icon}<span>{cat.name}</span>
+                  {cat.icon}<span>{cat.label}</span>
                 </div>
               ))}
             </>
@@ -990,11 +1060,11 @@ function App() {
         <div style={{ marginTop: 'auto' }} className="nav-links">
           <div className={`nav-item ${isSettingsOpen ? 'active' : ''}`}
             onClick={() => token ? setIsSettingsOpen(true) : setIsLoginOpen(true)}>
-            <Settings size={18} /><span>Configurações</span>
+            <Settings size={18} /><span>{t('navSettings')}</span>
           </div>
           {token && (
-            <div className="nav-item" onClick={handleLogout} title="Sair">
-              <User size={18} /><span>Sair</span>
+            <div className="nav-item" onClick={handleLogout} title={t('navLogout')}>
+              <User size={18} /><span>{t('navLogout')}</span>
             </div>
           )}
         </div>
@@ -1012,7 +1082,7 @@ function App() {
             <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#86868b' }} />
             <input
               className="search-bar"
-              placeholder="Buscar no AppHub... (ou pressione ⌘K)"
+              placeholder={t('searchPlaceholder')}
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               style={{ cursor: 'pointer' }}
@@ -1034,7 +1104,7 @@ function App() {
                 style={{ background: 'rgba(175,82,222,0.25)', border: '1px solid rgba(175,82,222,0.4)', color: '#fff' }}
                 onClick={handleCheckAllUpdates}
                 disabled={checkingAll}
-                title="Verificar atualização de todos os aplicativos na internet"
+                title={t('checkAllUpdates')}
               >
                 <RefreshCw size={16} className={checkingAll ? 'spin' : ''} />
                 <span style={{ fontSize: '0.85rem' }}>Auto-Update ({autoUpdateCount})</span>
@@ -1043,11 +1113,11 @@ function App() {
 
             {token ? (
               <button className="download-btn" onClick={() => setIsModalOpen(true)}>
-                <Plus size={18} /> Novo App
+                <Plus size={18} /> {t('navNewApp')}
               </button>
             ) : (
               <button className="download-btn" style={{ background: 'rgba(255,255,255,0.1)', color: '#fff' }} onClick={() => setIsLoginOpen(true)}>
-                Login Admin
+                {t('navLoginAdmin')}
               </button>
             )}
           </div>
@@ -1069,12 +1139,10 @@ function App() {
                     <Sparkles size={12} /> Apple Developer Academy Distribution
                   </div>
                   <h1 style={{ fontSize: '2.4rem', fontWeight: '800', color: 'white', marginBottom: '0.5rem', lineHeight: 1.2 }}>
-                    {contentTab === 'files' ? 'Arquivos & Documentos' : 'Central de Aplicativos'}
+                    {contentTab === 'files' ? t('heroFilesTitle') : t('heroAppsTitle')}
                   </h1>
                   <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: '1rem', maxWidth: '600px' }}>
-                    {contentTab === 'files'
-                      ? 'Distribua assets, documentações, certificados e perfis de provisionamento na rede local.'
-                      : 'Distribuição ultra-rápida de ferramentas, IDEs e softwares para estudantes e mentores da Academy.'}
+                    {contentTab === 'files' ? t('heroFilesDesc') : t('heroAppsDesc')}
                   </p>
                 </div>
                 <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
@@ -1082,20 +1150,20 @@ function App() {
                     padding: '0.6rem 1.2rem', borderRadius: '12px', border: 'none', cursor: 'pointer', fontWeight: '600', fontSize: '0.9rem',
                     background: contentTab === 'apps' ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.08)',
                     color: 'white', backdropFilter: 'blur(10px)'
-                  }}><Package size={14} style={{ marginRight: '6px', verticalAlign: 'middle' }} />Apps</button>
+                  }}><Package size={14} style={{ marginRight: '6px', verticalAlign: 'middle' }} />{t('navApps')}</button>
                   <button onClick={() => setContentTab('files')} style={{
                     padding: '0.6rem 1.2rem', borderRadius: '12px', border: 'none', cursor: 'pointer', fontWeight: '600', fontSize: '0.9rem',
                     background: contentTab === 'files' ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.08)',
                     color: 'white', backdropFilter: 'blur(10px)'
-                  }}><FileText size={14} style={{ marginRight: '6px', verticalAlign: 'middle' }} />Arquivos</button>
+                  }}><FileText size={14} style={{ marginRight: '6px', verticalAlign: 'middle' }} />{t('navFiles')}</button>
                 </div>
               </div>
 
               <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <h2 style={{ fontSize: '1.6rem', fontWeight: '700' }}>{contentTab === 'files' ? 'Arquivos' : 'Aplicativos'}</h2>
+                  <h2 style={{ fontSize: '1.6rem', fontWeight: '700' }}>{contentTab === 'files' ? t('navFiles') : t('applications')}</h2>
                   <p style={{ color: '#86868b', marginTop: '0.3rem', fontSize: '0.9rem' }}>
-                    {filteredApps.length} {contentTab === 'files' ? 'arquivos' : 'apps'} disponíveis para instalação imediata
+                    {filteredApps.length} {contentTab === 'files' ? t('files') : t('apps')} {t('availableForInstall')}
                   </p>
                 </div>
               </div>
@@ -1136,7 +1204,7 @@ function App() {
                             </div>
                             <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '4px' }}>
                               <span className="badge">{app.category}</span>
-                              <TypeBadge type={app.type} />
+                              <TypeBadge type={app.type} lang={lang} />
                               {app.autoUpdate && (
                                 <span style={{
                                   fontSize: '0.7rem', fontWeight: '600', padding: '2px 7px',
@@ -1162,7 +1230,7 @@ function App() {
                             borderRadius: '10px', padding: '8px 12px', marginTop: '0.4rem'
                           }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#64d2ff', fontWeight: '600', marginBottom: '4px' }}>
-                              <span>{isChecking ? 'Verificando versão...' : `Baixando v${upStatus.remoteVersion || ''}`}</span>
+                              <span>{isChecking ? t('checkingVersion') : `${t('downloadingVersion')}${upStatus.remoteVersion || ''}`}</span>
                               <span>{upStatus.progress || 0}% {upStatus.speed ? `• ${upStatus.speed}` : ''}</span>
                             </div>
                             <div style={{ width: '100%', height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
@@ -1181,7 +1249,7 @@ function App() {
                           style={{ fontSize: '0.85rem', color: '#86868b', lineHeight: '1.5', marginTop: '0.5rem', height: '3.2em', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', cursor: 'pointer' }}
                           onClick={() => setSelectedAppForDetails(app)}
                         >
-                          {app.description || 'Clique para ver detalhes, requisitos e changelog.'}
+                          {app.description || t('clickForDetails')}
                         </p>
 
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto', paddingTop: '0.8rem', borderTop: '1px solid var(--glass-border)' }}>
@@ -1209,7 +1277,7 @@ function App() {
                                 color: copiedLinkAppId === app.id ? '#30d158' : '#86868b',
                                 border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center'
                               }}
-                              title={copiedLinkAppId === app.id ? "Link copiado!" : "Copiar link de download"}
+                              title={copiedLinkAppId === app.id ? t('linkCopied') : t('linkCopyTitle')}
                             >
                               {copiedLinkAppId === app.id ? <Check size={14} /> : <Share2 size={14} />}
                             </button>
@@ -1225,23 +1293,23 @@ function App() {
                                       color: '#af52de', border: '1px solid rgba(175,82,222,0.3)', cursor: 'pointer',
                                       display: 'flex', alignItems: 'center'
                                     }}
-                                    title="Buscar e baixar nova versão agora na internet"
+                                    title={t('downloadNow')}
                                   >
                                     <CloudDownload size={14} className={isDownloading || isChecking ? 'spin' : ''} />
                                   </button>
                                 )}
                                 <button onClick={() => openEditModal(app)}
                                   style={{ background: 'rgba(255,255,255,0.08)', padding: '7px', borderRadius: '9px', color: '#fff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-                                  title="Editar"><Pencil size={14} /></button>
+                                  title={t('edit')}><Pencil size={14} /></button>
                                 <button onClick={() => handleDelete(app.id)}
                                   style={{ background: 'rgba(255,0,0,0.12)', padding: '7px', borderRadius: '9px', color: '#ff453a', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-                                  title="Excluir"><Trash2 size={14} /></button>
+                                  title={t('delete')}><Trash2 size={14} /></button>
                               </>
                             )}
 
                             {app.type === 'linked' && app.externalUrl ? (
                               <a href={app.externalUrl} target="_blank" rel="noopener noreferrer" className="download-btn" style={{ display: 'flex', alignItems: 'center', gap: '5px', textDecoration: 'none', fontSize: '0.85rem', padding: '8px 14px' }}>
-                                <Globe size={14} /> Acessar
+                                <Globe size={14} /> {t('accessLink')}
                               </a>
                             ) : (
                               <button
@@ -1253,7 +1321,7 @@ function App() {
                                   pointerEvents: (app.available !== false && app.downloadUrl !== '#') ? 'auto' : 'none'
                                 }}
                               >
-                                <Download size={14} /> Baixar
+                                <Download size={14} /> {t('download')}
                               </button>
                             )}
                           </div>
@@ -1267,8 +1335,8 @@ function App() {
               {filteredApps.length === 0 && !loading && (
                 <div style={{ textAlign: 'center', marginTop: '6rem', color: '#86868b' }}>
                   <Package size={56} style={{ margin: '0 auto 1rem', opacity: 0.2 }} />
-                  <h3>Nenhum item encontrado</h3>
-                  <p>Ajuste sua busca ou adicione um novo item.</p>
+                  <h3>{t('noItemFound')}</h3>
+                  <p>{t('adjustSearch')}</p>
                 </div>
               )}
             </motion.div>
@@ -1279,21 +1347,21 @@ function App() {
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                 <div>
-                  <h2 style={{ fontSize: '1.8rem', fontWeight: '800' }}>Monitor & Métricas da Academy</h2>
-                  <p style={{ color: '#86868b', fontSize: '0.9rem' }}>Estatísticas de adesão, tráfego economizado e automações</p>
+                  <h2 style={{ fontSize: '1.8rem', fontWeight: '800' }}>{t('monitorTitle')}</h2>
+                  <p style={{ color: '#86868b', fontSize: '0.9rem' }}>{t('monitorSubtitle')}</p>
                 </div>
                 <div style={{ display: 'flex', gap: '0.8rem' }}>
                   {autoUpdateCount > 0 && (
                     <button className="download-btn" onClick={handleCheckAllUpdates} disabled={checkingAll}
                       style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(175,82,222,0.25)', border: '1px solid rgba(175,82,222,0.4)', color: '#fff' }}>
                       <RefreshCw size={16} className={checkingAll ? 'spin' : ''} />
-                      {checkingAll ? 'Verificando...' : 'Verificar Todas as Atualizações'}
+                      {checkingAll ? t('checkingAll') : t('checkAllBtn')}
                     </button>
                   )}
                   <button className="download-btn" onClick={fetchMonitor} disabled={monitorLoading}
                     style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <RefreshCw size={16} className={monitorLoading ? 'spin' : ''} />
-                    {monitorLoading ? 'Carregando...' : 'Atualizar'}
+                    {monitorLoading ? t('loading') : t('refresh')}
                   </button>
                 </div>
               </div>
@@ -1301,24 +1369,24 @@ function App() {
               {!token ? (
                 <div style={{ textAlign: 'center', padding: '4rem', color: '#86868b' }}>
                   <Monitor size={48} style={{ opacity: 0.3, margin: '0 auto 1rem' }} />
-                  <p>Faça login como admin para acessar o Monitor.</p>
-                  <button className="download-btn" style={{ marginTop: '1rem' }} onClick={() => setIsLoginOpen(true)}>Login Admin</button>
+                  <p>{t('loginForMonitor')}</p>
+                  <button className="download-btn" style={{ marginTop: '1rem' }} onClick={() => setIsLoginOpen(true)}>{t('navLoginAdmin')}</button>
                 </div>
               ) : (
                 <>
                   {/* Tabs */}
                   <div style={{ display: 'flex', gap: '0', marginBottom: '1.5rem', background: 'rgba(255,255,255,0.04)', borderRadius: '12px', padding: '4px', width: 'fit-content' }}>
                     {[
-                      { key: 'dashboard', label: 'Dashboard & Downloads', icon: <TrendingUp size={15} /> },
-                      { key: 'updates', label: 'Atualizações Automáticas', icon: <Zap size={15} /> },
-                      { key: 'sync', label: 'Histórico de Atividades', icon: <Clock size={15} /> }
-                    ].map(t => (
-                      <button key={t.key} onClick={() => setMonitorTab(t.key)} style={{
+                      { key: 'dashboard', label: t('tabDashboard'), icon: <TrendingUp size={15} /> },
+                      { key: 'updates', label: t('tabAutoUpdates'), icon: <Zap size={15} /> },
+                      { key: 'sync', label: t('tabActivityHistory'), icon: <Clock size={15} /> }
+                    ].map(tab => (
+                      <button key={tab.key} onClick={() => setMonitorTab(tab.key)} style={{
                         display: 'flex', alignItems: 'center', gap: '6px', padding: '0.5rem 1.2rem',
                         borderRadius: '9px', border: 'none', cursor: 'pointer', fontWeight: '600', fontSize: '0.9rem',
-                        background: monitorTab === t.key ? 'rgba(255,255,255,0.1)' : 'transparent',
-                        color: monitorTab === t.key ? '#fff' : 'var(--text-secondary)', transition: 'all 0.2s'
-                      }}>{t.icon} {t.label}</button>
+                        background: monitorTab === tab.key ? 'rgba(255,255,255,0.1)' : 'transparent',
+                        color: monitorTab === tab.key ? '#fff' : 'var(--text-secondary)', transition: 'all 0.2s'
+                      }}>{tab.icon} {tab.label}</button>
                     ))}
                   </div>
 
@@ -1327,18 +1395,18 @@ function App() {
                     monitorLoading ? (
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '5rem', gap: '1rem', color: '#86868b' }}>
                         <RefreshCw size={36} className="spin" style={{ color: '#007aff' }} />
-                        <p style={{ fontSize: '1rem', fontWeight: '600' }}>Carregando métricas...</p>
+                        <p style={{ fontSize: '1rem', fontWeight: '600' }}>{t('loadingMetrics')}</p>
                       </div>
                     ) : !monitorData ? (
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '5rem', gap: '1rem', color: '#86868b', textAlign: 'center' }}>
                         <Monitor size={48} style={{ opacity: 0.3 }} />
-                        <p style={{ fontSize: '1rem', fontWeight: '600' }}>Clique em "Atualizar" para carregar as métricas</p>
+                        <p style={{ fontSize: '1rem', fontWeight: '600' }}>{t('clickRefresh')}</p>
                         <button className="download-btn" onClick={fetchMonitor} style={{ marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <RefreshCw size={16} /> Carregar Dashboard
+                          <RefreshCw size={16} /> {t('loadDashboard')}
                         </button>
                       </div>
                     ) : (
-                      <MonitorDashboard monitorData={monitorData} apps={apps} API_BASE={API_BASE} />
+                      <MonitorDashboard monitorData={monitorData} apps={apps} API_BASE={API_BASE} t={t} lang={lang} />
                     )
                   )}
 
@@ -1346,15 +1414,15 @@ function App() {
                   {monitorTab === 'updates' && (
                     <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '20px', border: '1px solid var(--glass-border)', overflow: 'hidden' }}>
                       <div style={{ padding: '1.2rem 1.5rem', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontWeight: '700', fontSize: '1rem' }}>Aplicativos Monitorados na Web</span>
-                        <span style={{ fontSize: '0.8rem', color: '#86868b' }}>{autoUpdateCount} de {apps.length} aplicativos</span>
+                        <span style={{ fontWeight: '700', fontSize: '1rem' }}>{t('monitoredWebApps')}</span>
+                        <span style={{ fontSize: '0.8rem', color: '#86868b' }}>{autoUpdateCount} {t('ofApps')} {apps.length} {t('applicativos')}</span>
                       </div>
 
                       <div style={{ overflowX: 'auto' }}>
                         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                           <thead>
                             <tr style={{ borderBottom: '1px solid var(--glass-border)' }}>
-                              {['Aplicativo', 'Estratégia / Fonte', 'Versão Local', 'Última Checagem', 'Status', 'Ações'].map(h => (
+                              {[t('thApp'), t('thStrategy'), t('thLocalVersion'), t('thLastCheck'), t('thStatus'), t('thActions')].map(h => (
                                 <th key={h} style={{ padding: '0.8rem 1.5rem', textAlign: 'left', fontSize: '0.8rem', fontWeight: '700', color: '#86868b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
                               ))}
                             </tr>
@@ -1362,6 +1430,7 @@ function App() {
                           <tbody>
                             {apps.filter(a => a.autoUpdate).map(app => {
                               const stCfg = STRATEGY_CONFIG[app.updateStrategy] || STRATEGY_CONFIG.catalog;
+                              const stLabel = { catalog: t('formStrategyCatalog'), direct_url: t('formStrategyDirect'), web_scrape: t('formStrategyScrape'), github: t('formStrategyGithub') }[app.updateStrategy] || t('formStrategyCatalog');
                               const upStatus = updateStatuses[app.id];
                               const isDownloading = upStatus && upStatus.status === 'downloading';
                               const isChecking = upStatus && upStatus.status === 'checking';
@@ -1381,7 +1450,7 @@ function App() {
 
                                   <td style={{ padding: '1rem 1.5rem' }}>
                                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: stCfg.color, fontWeight: '600' }}>
-                                      {stCfg.icon} {stCfg.label}
+                                      {stCfg.icon} {stLabel}
                                     </span>
                                     <div style={{ fontSize: '0.75rem', color: '#86868b', marginTop: '2px', maxWidth: '240px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                       {app.catalogId || app.updateUrl || '—'}
@@ -1393,25 +1462,25 @@ function App() {
                                   </td>
 
                                   <td style={{ padding: '1rem 1.5rem', color: '#86868b', fontSize: '0.85rem' }}>
-                                    {formatDate(app.lastCheckedAt)}
+                                    {formatDate(app.lastCheckedAt, lang)}
                                   </td>
 
                                   <td style={{ padding: '1rem 1.5rem' }}>
                                     {isDownloading ? (
                                       <span style={{ color: '#007aff', fontWeight: '600', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                        <RefreshCw size={13} className="spin" /> Baixando ({upStatus.progress}%)
+                                        <RefreshCw size={13} className="spin" /> {t('downloading')} ({upStatus.progress}%)
                                       </span>
                                     ) : isChecking ? (
                                       <span style={{ color: '#ff9f0a', fontWeight: '600', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                        <RefreshCw size={13} className="spin" /> Verificando...
+                                        <RefreshCw size={13} className="spin" /> {t('checking')}
                                       </span>
                                     ) : app.lastUpdateStatus === 'error' ? (
                                       <span style={{ color: '#ff453a', fontWeight: '600', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '5px' }} title={app.lastUpdateError}>
-                                        <XCircle size={13} /> Erro na fonte
+                                        <XCircle size={13} /> {t('sourceError')}
                                       </span>
                                     ) : (
                                       <span style={{ color: '#30d158', fontWeight: '600', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                        <CheckCircle size={13} /> Atualizado
+                                        <CheckCircle size={13} /> {t('upToDate')}
                                       </span>
                                     )}
                                   </td>
@@ -1427,7 +1496,7 @@ function App() {
                                       }}
                                     >
                                       <CloudDownload size={13} className={isDownloading || isChecking ? 'spin' : ''} />
-                                      {isDownloading ? 'Baixando' : 'Baixar Agora'}
+                                      {isDownloading ? t('downloading') : t('downloadNow')}
                                     </button>
                                   </td>
                                 </tr>
@@ -1443,22 +1512,23 @@ function App() {
                   {monitorTab === 'sync' && (
                     <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '20px', border: '1px solid var(--glass-border)', overflow: 'hidden' }}>
                       <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontWeight: '700', fontSize: '1rem' }}>Histórico de Atividades</span>
-                        <span style={{ fontSize: '0.8rem', color: '#86868b' }}>{monitorData?.activity?.length || 0} registros</span>
+                        <span style={{ fontWeight: '700', fontSize: '1rem' }}>{t('activityHistory')}</span>
+                        <span style={{ fontSize: '0.8rem', color: '#86868b' }}>{monitorData?.activity?.length || 0} {t('records')}</span>
                       </div>
                       {monitorData?.activity?.length > 0 ? (
                         <div style={{ overflowX: 'auto' }}>
                           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                             <thead>
                               <tr style={{ borderBottom: '1px solid var(--glass-border)' }}>
-                                {['Conteúdo', 'Tipo', 'Ação', 'Detalhes', 'Data / Hora'].map(h => (
+                                {[t('thContent'), t('thType'), t('thAction'), t('thDetails'), t('thDateTime')].map(h => (
                                   <th key={h} style={{ padding: '0.8rem 1.5rem', textAlign: 'left', fontSize: '0.8rem', fontWeight: '700', color: '#86868b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
                                 ))}
                               </tr>
                             </thead>
                             <tbody>
                               {monitorData.activity.map(a => {
-                                const action = ACTION_LABELS[a.action] || { label: a.action, color: '#86868b' };
+                                const actionCfg = ACTION_LABELS_KEYS[a.action] || { key: a.action, color: '#86868b' };
+                                const actionLabel = t(actionCfg.key) || a.action;
                                 return (
                                   <tr key={a.id} style={{ borderBottom: '1px solid var(--glass-border)', transition: 'background 0.15s' }}
                                     onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.03)'}
@@ -1466,13 +1536,13 @@ function App() {
                                     <td style={{ padding: '0.9rem 1.5rem', fontWeight: '600' }}>{a.appName}</td>
                                     <td style={{ padding: '0.9rem 1.5rem' }}><TypeBadge type={a.appType} /></td>
                                     <td style={{ padding: '0.9rem 1.5rem' }}>
-                                      <span style={{ color: action.color, fontWeight: '600', fontSize: '0.85rem' }}>● {action.label}</span>
+                                      <span style={{ color: actionCfg.color, fontWeight: '600', fontSize: '0.85rem' }}>● {actionLabel}</span>
                                     </td>
                                     <td style={{ padding: '0.9rem 1.5rem', fontSize: '0.85rem', color: '#86868b' }}>
                                       {a.details || '—'}
                                     </td>
                                     <td style={{ padding: '0.9rem 1.5rem', color: '#86868b', fontSize: '0.85rem' }}>
-                                      <Clock size={13} style={{ verticalAlign: 'middle', marginRight: '4px' }} />{formatDate(a.timestamp)}
+                                      <Clock size={13} style={{ verticalAlign: 'middle', marginRight: '4px' }} />{formatDate(a.timestamp, lang)}
                                     </td>
                                   </tr>
                                 );
@@ -1483,7 +1553,7 @@ function App() {
                       ) : (
                         <div style={{ padding: '4rem', textAlign: 'center', color: '#86868b' }}>
                           <Clock size={40} style={{ opacity: 0.2, margin: '0 auto 1rem' }} />
-                          <p>Nenhuma atividade registrada ainda.</p>
+                          <p>{t('noActivityYet')}</p>
                         </div>
                       )}
                     </div>
@@ -1498,12 +1568,12 @@ function App() {
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                 <div>
-                  <h2 style={{ fontSize: '1.8rem', fontWeight: '800' }}>Locais & Salas da Academy</h2>
-                  <p style={{ color: '#86868b', fontSize: '0.9rem' }}>Organização e pontos de distribuição de software</p>
+                  <h2 style={{ fontSize: '1.8rem', fontWeight: '800' }}>{t('locationsTitle')}</h2>
+                  <p style={{ color: '#86868b', fontSize: '0.9rem' }}>{t('locationsSubtitle')}</p>
                 </div>
                 {token && (
                   <button className="download-btn" onClick={() => { setEditingLocation(null); setNewLocation({ name: '', description: '', icon: '🏢' }); setIsLocationModalOpen(true); }}>
-                    <Plus size={16} /> Adicionar Local
+                    <Plus size={16} /> {t('newLocation')}
                   </button>
                 )}
               </div>
@@ -1511,8 +1581,8 @@ function App() {
               {locations.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '5rem', color: '#86868b' }}>
                   <MapPin size={48} style={{ opacity: 0.2, margin: '0 auto 1rem' }} />
-                  <h3>Nenhum local cadastrado</h3>
-                  <p>Adicione salas ou laboratórios para organizar o AppHub.</p>
+                  <h3>{t('noLocationsYet')}</h3>
+                  <p>{t('noLocationsDesc')}</p>
                 </div>
               ) : (
                 <div style={{ display: 'grid', gap: '0.8rem' }}>
@@ -1527,7 +1597,7 @@ function App() {
                         {loc.description && <div style={{ fontSize: '0.85rem', color: '#86868b', marginTop: '2px' }}>{loc.description}</div>}
                         <div style={{ fontSize: '0.75rem', color: '#86868b', marginTop: '4px' }}>
                           <Clock size={11} style={{ verticalAlign: 'middle', marginRight: '3px' }} />
-                          Criado em {formatDate(loc.createdAt)}
+                          {t('createdAt')} {formatDate(loc.createdAt, lang)}
                         </div>
                       </div>
                       {token && (
@@ -1574,7 +1644,7 @@ function App() {
                 <input
                   ref={spotlightInputRef}
                   type="text"
-                  placeholder="Buscar aplicativo, IDE, utilitário..."
+                  placeholder={t('searchSpotlightPlaceholder')}
                   value={spotlightQuery}
                   onChange={e => { setSpotlightQuery(e.target.value); setSpotlightSelectedIndex(0); }}
                   onKeyDown={handleSpotlightKeyDown}
@@ -1633,7 +1703,7 @@ function App() {
                 ) : (
                   <div style={{ padding: '2.5rem', textAlign: 'center', color: '#86868b' }}>
                     <Search size={32} style={{ opacity: 0.3, margin: '0 auto 0.5rem' }} />
-                    <p>Nenhum aplicativo encontrado para "{spotlightQuery}"</p>
+                    <p>{t('noAppFoundFor')} "{spotlightQuery}"</p>
                   </div>
                 )}
               </div>
@@ -1645,10 +1715,10 @@ function App() {
                 fontSize: '0.75rem', color: '#86868b', background: 'rgba(0,0,0,0.2)'
               }}>
                 <div style={{ display: 'flex', gap: '1rem' }}>
-                  <span><kbd style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 5px', borderRadius: '4px' }}>↑</kbd> <kbd style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 5px', borderRadius: '4px' }}>↓</kbd> navegar</span>
-                  <span><kbd style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 5px', borderRadius: '4px' }}>↵</kbd> abrir detalhes</span>
+                  <span><kbd style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 5px', borderRadius: '4px' }}>↑</kbd> <kbd style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 5px', borderRadius: '4px' }}>↓</kbd> {t('spotlightNavigate')}</span>
+                  <span><kbd style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 5px', borderRadius: '4px' }}>↵</kbd> {t('spotlightOpen')}</span>
                 </div>
-                <span><kbd style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 5px', borderRadius: '4px' }}>esc</kbd> fechar</span>
+                <span><kbd style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 5px', borderRadius: '4px' }}>esc</kbd> {t('spotlightClose')}</span>
               </div>
             </motion.div>
           </div>
@@ -1685,7 +1755,7 @@ function App() {
                   </div>
                   <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '6px' }}>
                     <span className="badge">{selectedAppForDetails.category}</span>
-                    <TypeBadge type={selectedAppForDetails.type} />
+                    <TypeBadge type={selectedAppForDetails.type} lang={lang} />
                     <span style={{ fontSize: '0.75rem', color: '#86868b' }}>
                       v{Array.isArray(selectedAppForDetails.version) ? selectedAppForDetails.version[0] : (selectedAppForDetails.version || '1.0.0')}
                     </span>
@@ -1700,7 +1770,7 @@ function App() {
               <div style={{ display: 'flex', gap: '0.8rem', marginTop: '1.2rem', paddingBottom: '1.2rem', borderBottom: '1px solid var(--glass-border)' }}>
                 {selectedAppForDetails.type === 'linked' && selectedAppForDetails.externalUrl ? (
                   <a href={selectedAppForDetails.externalUrl} target="_blank" rel="noopener noreferrer" className="download-btn" style={{ flex: 1, padding: '0.8rem', textDecoration: 'none' }}>
-                    <Globe size={16} /> Acessar Link Oficial
+                    <Globe size={16} /> {t('accessOfficialLink')}
                   </a>
                 ) : (
                   <button
@@ -1708,7 +1778,7 @@ function App() {
                     className="download-btn"
                     style={{ flex: 1, padding: '0.8rem' }}
                   >
-                    <Download size={16} /> Baixar Instalador {selectedAppForDetails.fileSize ? `(${selectedAppForDetails.fileSize})` : ''}
+                    <Download size={16} /> {t('downloadInstaller')} {selectedAppForDetails.fileSize ? `(${selectedAppForDetails.fileSize})` : ''}
                   </button>
                 )}
 
@@ -1718,7 +1788,7 @@ function App() {
                   style={{ background: 'rgba(255,255,255,0.08)', color: '#fff', border: '1px solid rgba(255,255,255,0.15)' }}
                 >
                   {copiedLinkAppId === selectedAppForDetails.id ? <Check size={16} color="#30d158" /> : <Copy size={16} />}
-                  <span>{copiedLinkAppId === selectedAppForDetails.id ? 'Link Copiado!' : 'Copiar Link'}</span>
+                  <span>{copiedLinkAppId === selectedAppForDetails.id ? t('linkCopiedBang') : t('copyLink')}</span>
                 </button>
               </div>
 
@@ -1726,25 +1796,25 @@ function App() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.8rem', margin: '0.8rem 0' }}>
                 <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--glass-border)', borderRadius: '12px', padding: '0.8rem', textAlign: 'center' }}>
                   <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#30d158' }}>{selectedAppForDetails.downloadCount || 0}</div>
-                  <div style={{ fontSize: '0.75rem', color: '#86868b' }}>Downloads na Academy</div>
+                  <div style={{ fontSize: '0.75rem', color: '#86868b' }}>{t('downloadsAtAcademy')}</div>
                 </div>
                 <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--glass-border)', borderRadius: '12px', padding: '0.8rem', textAlign: 'center' }}>
                   <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#007aff' }}>{selectedAppForDetails.fileSize || '—'}</div>
-                  <div style={{ fontSize: '0.75rem', color: '#86868b' }}>Tamanho do Pacote</div>
+                  <div style={{ fontSize: '0.75rem', color: '#86868b' }}>{t('packageSize')}</div>
                 </div>
                 <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--glass-border)', borderRadius: '12px', padding: '0.8rem', textAlign: 'center' }}>
                   <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#af52de' }}>
-                    {selectedAppForDetails.autoUpdate ? 'Automático' : 'Manual'}
+                    {selectedAppForDetails.autoUpdate ? t('automatic') : t('manual')}
                   </div>
-                  <div style={{ fontSize: '0.75rem', color: '#86868b' }}>Modo de Atualização</div>
+                  <div style={{ fontSize: '0.75rem', color: '#86868b' }}>{t('updateMode')}</div>
                 </div>
               </div>
 
               {/* Descrição Completa */}
               <div style={{ marginTop: '0.5rem' }}>
-                <h4 style={{ fontSize: '0.95rem', fontWeight: '700', marginBottom: '0.4rem' }}>Sobre o Aplicativo</h4>
+                <h4 style={{ fontSize: '0.95rem', fontWeight: '700', marginBottom: '0.4rem' }}>{t('aboutApp')}</h4>
                 <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6', fontSize: '0.9rem' }}>
-                  {selectedAppForDetails.description || 'Nenhuma descrição detalhada disponível.'}
+                  {selectedAppForDetails.description || t('noDescAvailable')}
                 </p>
               </div>
 
@@ -1752,7 +1822,7 @@ function App() {
               {selectedAppForDetails.requirements && (
                 <div style={{ marginTop: '1rem', background: 'rgba(0,122,255,0.06)', border: '1px solid rgba(0,122,255,0.2)', borderRadius: '14px', padding: '1rem' }}>
                   <div style={{ fontWeight: '700', fontSize: '0.85rem', color: '#64d2ff', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '0.3rem' }}>
-                    <Cpu size={14} /> Requisitos do Sistema
+                    <Cpu size={14} /> {t('systemRequirements')}
                   </div>
                   <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.8)', margin: 0 }}>
                     {selectedAppForDetails.requirements}
@@ -1764,7 +1834,7 @@ function App() {
               {selectedAppForDetails.changelog && (
                 <div style={{ marginTop: '1rem', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--glass-border)', borderRadius: '14px', padding: '1rem' }}>
                   <div style={{ fontWeight: '700', fontSize: '0.85rem', color: '#fff', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '0.3rem' }}>
-                    <Sparkles size={14} color="#FFD700" /> O que há de novo nesta versão
+                    <Sparkles size={14} color="#FFD700" /> {t('whatsNewVersion')}
                   </div>
                   <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: 0, lineHeight: '1.5' }}>
                     {selectedAppForDetails.changelog}
@@ -1776,7 +1846,7 @@ function App() {
               {selectedAppForDetails.screenshots && selectedAppForDetails.screenshots.length > 0 && (
                 <div style={{ marginTop: '1rem' }}>
                   <h4 style={{ fontSize: '0.95rem', fontWeight: '700', marginBottom: '0.6rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <Image size={15} /> Prévia da Interface
+                    <Image size={15} /> {t('previewInterface')}
                   </h4>
                   <div style={{ display: 'flex', gap: '0.8rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
                     {selectedAppForDetails.screenshots.map((imgUrl, i) => (
@@ -1804,7 +1874,7 @@ function App() {
               style={{ maxWidth: '620px', maxHeight: '90vh', overflowY: 'auto' }}>
 
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.2rem' }}>
-                <h3 style={{ fontSize: '1.4rem', fontWeight: '800' }}>{editingApp ? 'Editar' : 'Novo'} {contentTab === 'files' ? 'Arquivo' : 'App'}</h3>
+                <h3 style={{ fontSize: '1.4rem', fontWeight: '800' }}>{editingApp ? t('modalEdit') : t('modalNewApp')} {contentTab === 'files' ? t('modalFile') : t('modalApp')}</h3>
                 <X style={{ cursor: 'pointer' }} onClick={resetModal} />
               </div>
 
@@ -1812,7 +1882,7 @@ function App() {
               {!editingApp && contentTab === 'apps' && catalogList.length > 0 && (
                 <div style={{ background: 'rgba(175,82,222,0.08)', border: '1px solid rgba(175,82,222,0.25)', borderRadius: '14px', padding: '0.8rem 1rem', marginBottom: '0.8rem' }}>
                   <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#d896ff', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                    <Sparkles size={13} /> Preenchimento Automático com 1 Clique (Sites Oficiais)
+                    <Sparkles size={13} /> {t('presetsTitle')}
                   </div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
                     {catalogList.map(preset => (
@@ -1837,54 +1907,54 @@ function App() {
               <form onSubmit={handleUpload} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 {/* Tipo */}
                 <div className="form-group">
-                  <label>Tipo</label>
+                  <label>{t('formType')}</label>
                   <div style={{ display: 'flex', gap: '0.5rem' }}>
                     {Object.entries(TYPE_CONFIG).map(([key, cfg]) => (
                       <button key={key} type="button" onClick={() => setNewApp({ ...newApp, type: key })} style={{
                         flex: 1, padding: '0.6rem', borderRadius: '10px', border: `1px solid ${newApp.type === key ? cfg.color : 'rgba(255,255,255,0.15)'}`,
                         background: newApp.type === key ? cfg.bg : 'transparent', color: newApp.type === key ? cfg.color : 'var(--text-secondary)',
                         cursor: 'pointer', fontWeight: '600', fontSize: '0.85rem', transition: 'all 0.2s'
-                      }}>{cfg.label}</button>
+                      }}>{{ hosted: t('typeHosted'), linked: t('typeLinked'), file: t('typeFile') }[key]}</button>
                     ))}
                   </div>
                 </div>
 
                 <div className="form-group">
-                  <label>Nome do Aplicativo</label>
+                  <label>{t('formAppName')}</label>
                   <input type="text" required value={newApp.name} onChange={e => setNewApp({ ...newApp, name: e.target.value })} />
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                   <div className="form-group">
-                    <label>Categoria</label>
+                    <label>{t('formCategory')}</label>
                     <select value={newApp.category} onChange={e => setNewApp({ ...newApp, category: e.target.value })}>
                       {['Utilitários', 'Desenvolvimento', 'Navegador', 'Office', 'Design', 'Ferramentas', 'Educação', 'Segurança'].map(c => <option key={c}>{c}</option>)}
                     </select>
                   </div>
                   <div className="form-group">
-                    <label>Versão</label>
+                    <label>{t('formVersion')}</label>
                     <input type="text" value={newApp.version} onChange={e => setNewApp({ ...newApp, version: e.target.value })} />
                   </div>
                 </div>
 
                 <div className="form-group">
-                  <label>Descrição</label>
+                  <label>{t('formDesc')}</label>
                   <textarea rows="2" value={newApp.description} onChange={e => setNewApp({ ...newApp, description: e.target.value })} />
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                   <div className="form-group">
-                    <label>Requisitos do Sistema (opcional)</label>
-                    <input type="text" placeholder="ex: macOS 14 Sonoma ou superior" value={newApp.requirements} onChange={e => setNewApp({ ...newApp, requirements: e.target.value })} />
+                    <label>{t('formReqs')}</label>
+                    <input type="text" placeholder={t('formReqsPlaceholder')} value={newApp.requirements} onChange={e => setNewApp({ ...newApp, requirements: e.target.value })} />
                   </div>
                   <div className="form-group">
-                    <label>Changelog / Novidades (opcional)</label>
-                    <input type="text" placeholder="ex: Suporte a Swift 6 e novos SDKs" value={newApp.changelog} onChange={e => setNewApp({ ...newApp, changelog: e.target.value })} />
+                    <label>{t('formChangelog')}</label>
+                    <input type="text" placeholder={t('formChangelogPlaceholder')} value={newApp.changelog} onChange={e => setNewApp({ ...newApp, changelog: e.target.value })} />
                   </div>
                 </div>
 
                 <div className="form-group">
-                  <label>Plataformas</label>
+                  <label>{t('formPlatforms')}</label>
                   <PlatformPicker selected={newApp.platforms} onChange={p => setNewApp({ ...newApp, platforms: p })} />
                 </div>
 
@@ -1900,7 +1970,7 @@ function App() {
                 {/* URL Externa (para tipo linked) */}
                 {newApp.type === 'linked' && (
                   <div className="form-group">
-                    <label>URL Externa (link de acesso/download)</label>
+                    <label>{t('formExternalUrl')}</label>
                     <input type="url" placeholder="https://..." value={newApp.externalUrl} onChange={e => setNewApp({ ...newApp, externalUrl: e.target.value })} />
                   </div>
                 )}
@@ -1913,7 +1983,7 @@ function App() {
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div>
                       <div style={{ fontWeight: '700', fontSize: '0.95rem', color: '#d896ff', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <Zap size={16} /> Atualização Automática na Internet
+                        <Zap size={16} /> {t('formAutoUpdate')}
                       </div>
                       <div style={{ fontSize: '0.8rem', color: '#86868b' }}>
                         O servidor buscará e baixará novas versões direto da fonte oficial
@@ -1925,7 +1995,7 @@ function App() {
                   {newApp.autoUpdate && (
                     <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', paddingTop: '0.5rem', borderTop: '1px solid rgba(175,82,222,0.2)' }}>
                       <div className="form-group">
-                        <label style={{ color: '#d896ff' }}>Estratégia de Busca</label>
+                        <label style={{ color: '#d896ff' }}>{t('formStrategy')}</label>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
                           {Object.entries(STRATEGY_CONFIG).map(([key, cfg]) => (
                             <button
@@ -1939,7 +2009,7 @@ function App() {
                                 cursor: 'pointer', fontWeight: '600', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '6px'
                               }}
                             >
-                              {cfg.icon} {cfg.label}
+                              {cfg.icon} {{ catalog: t('formStrategyCatalog'), direct_url: t('formStrategyDirect'), web_scrape: t('formStrategyScrape'), github: t('formStrategyGithub') }[key]}
                             </button>
                           ))}
                         </div>
@@ -1947,7 +2017,7 @@ function App() {
 
                       {newApp.updateStrategy === 'catalog' && (
                         <div className="form-group">
-                          <label>Identificador no Catálogo (ex: google-chrome, brave-browser, figma, omnidisksweeper)</label>
+                          <label>{t('formCatalogId')}</label>
                           <input
                             type="text"
                             placeholder="google-chrome"
@@ -1959,7 +2029,7 @@ function App() {
 
                       {newApp.updateStrategy === 'direct_url' && (
                         <div className="form-group">
-                          <label>URL Direta de Download Oficial (Latest URL)</label>
+                          <label>{t('formDirectUrl')}</label>
                           <input
                             type="url"
                             placeholder="https://dl.google.com/chrome/mac/universal/stable/GGRO/googlechrome.dmg"
@@ -1972,7 +2042,7 @@ function App() {
                       {newApp.updateStrategy === 'web_scrape' && (
                         <>
                           <div className="form-group">
-                            <label>URL da Página de Download do Fabricante</label>
+                            <label>{t('formWebUrl')}</label>
                             <input
                               type="url"
                               placeholder="https://site.com/download"
@@ -1981,7 +2051,7 @@ function App() {
                             />
                           </div>
                           <div className="form-group">
-                            <label>Padrão de busca (opcional, ex: \.dmg$ ou \.pkg$)</label>
+                            <label>{t('formPattern')}</label>
                             <input
                               type="text"
                               placeholder="\.dmg$"
@@ -1994,10 +2064,10 @@ function App() {
 
                       {newApp.updateStrategy === 'github' && (
                         <div className="form-group">
-                          <label>Repositório GitHub (autor/nome-do-repositorio)</label>
+                          <label>{t('formGithubRepo')}</label>
                           <input
                             type="text"
-                            placeholder="ex: desktop/desktop ou autor/meu-app"
+                            placeholder={t('formGithubPlaceholder')}
                             value={newApp.updateUrl}
                             onChange={e => setNewApp({ ...newApp, updateUrl: e.target.value })}
                           />
@@ -2010,15 +2080,15 @@ function App() {
                 {/* Disponível */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.8rem 1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
                   <div>
-                    <div style={{ fontWeight: '600', fontSize: '0.9rem' }}>Disponível para usuários</div>
-                    <div style={{ fontSize: '0.8rem', color: '#86868b' }}>Desative para ocultar este item temporariamente</div>
+                    <div style={{ fontWeight: '600', fontSize: '0.9rem' }}>{t('formAvailable')}</div>
+                    <div style={{ fontSize: '0.8rem', color: '#86868b' }}>{t('formAvailableSub')}</div>
                   </div>
                   <ToggleSwitch checked={newApp.available} onChange={() => setNewApp({ ...newApp, available: !newApp.available })} />
                 </div>
 
                 {/* Ícone */}
                 <div className="form-group">
-                  <label>Ícone</label>
+                  <label>{t('formAppIcon')}</label>
                   <div className="file-upload-area" style={{ padding: '1rem' }}>
                     <input type="file" accept="image/*" onChange={e => { const f = e.target.files[0]; if (f) { setSelectedIcon(f); setIconPreview(URL.createObjectURL(f)); } }} style={{ display: 'none' }} id="icon-input" />
                     <label htmlFor="icon-input" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -2029,7 +2099,7 @@ function App() {
                           <Upload size={20} style={{ opacity: 0.4 }} />
                         </div>
                       )}
-                      <span style={{ fontSize: '0.85rem', color: '#86868b' }}>{selectedIcon ? selectedIcon.name : 'Selecionar ícone (PNG, SVG, JPG)'}</span>
+                      <span style={{ fontSize: '0.85rem', color: '#86868b' }}>{selectedIcon ? selectedIcon.name : t('formSelectIcon')}</span>
                     </label>
                   </div>
                 </div>
@@ -2038,8 +2108,8 @@ function App() {
                 {(newApp.type === 'hosted' || newApp.type === 'file') && (
                   <div className="form-group">
                     <label>
-                      {newApp.type === 'file' ? 'Documento' : 'Arquivo do Instalador'}
-                      {newApp.autoUpdate && <span style={{ color: '#d896ff', marginLeft: '6px', fontSize: '0.75rem' }}>(Opcional se a Atualização Automática estiver ativa)</span>}
+                      {newApp.type === 'file' ? t('formDocument') : t('formInstallerFile')}
+                      {newApp.autoUpdate && <span style={{ color: '#d896ff', marginLeft: '6px', fontSize: '0.75rem' }}>{t('formOptionalAutoUpdate')}</span>}
                     </label>
                     <div className="file-upload-area" style={{ padding: '1rem' }}>
                       <input type="file" onChange={e => setSelectedFile(e.target.files[0])} style={{ display: 'none' }} id="file-input" />
@@ -2048,7 +2118,7 @@ function App() {
                           <Package size={20} style={{ opacity: 0.4 }} />
                         </div>
                         <span style={{ fontSize: '0.85rem', color: '#86868b' }}>
-                          {selectedFile ? selectedFile.name : (newApp.autoUpdate ? 'Deixe em branco para o servidor baixar sozinho da internet' : (editingApp ? 'Substituir arquivo (opcional)' : 'Selecionar arquivo'))}
+                          {selectedFile ? selectedFile.name : (newApp.autoUpdate ? t('formAutoDownloadHint') : (editingApp ? t('formReplaceFile') : t('formSelectFile')))}
                         </span>
                       </label>
                     </div>
@@ -2056,7 +2126,7 @@ function App() {
                 )}
 
                 <button type="submit" className="download-btn" style={{ width: '100%', marginTop: '0.5rem', opacity: uploading ? 0.7 : 1 }} disabled={uploading}>
-                  {uploading ? 'Processando...' : (editingApp ? 'Salvar Alterações' : 'Cadastrar')}
+                  {uploading ? t('formProcessing') : (editingApp ? t('formSave') : t('formCreate'))}
                 </button>
               </form>
             </motion.div>
@@ -2072,27 +2142,27 @@ function App() {
               initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
               style={{ maxWidth: '420px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-                <h3 style={{ fontSize: '1.4rem', fontWeight: '800' }}>{editingLocation ? 'Editar' : 'Novo'} Local</h3>
+                <h3 style={{ fontSize: '1.4rem', fontWeight: '800' }}>{editingLocation ? t('locationModalEdit') : t('locationModalNew')} {t('locationModalPlace')}</h3>
                 <X style={{ cursor: 'pointer' }} onClick={() => setIsLocationModalOpen(false)} />
               </div>
               <form onSubmit={handleSaveLocation} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '60px 1fr', gap: '1rem', alignItems: 'end' }}>
                   <div className="form-group">
-                    <label>Ícone</label>
+                    <label>{t('locationIcon')}</label>
                     <input type="text" maxLength="2" value={newLocation.icon} onChange={e => setNewLocation({ ...newLocation, icon: e.target.value })}
                       style={{ textAlign: 'center', fontSize: '1.5rem' }} />
                   </div>
                   <div className="form-group">
-                    <label>Nome do Local</label>
+                    <label>{t('locationName')}</label>
                     <input type="text" required value={newLocation.name} onChange={e => setNewLocation({ ...newLocation, name: e.target.value })} />
                   </div>
                 </div>
                 <div className="form-group">
-                  <label>Descrição (opcional)</label>
+                  <label>{t('locationDesc')}</label>
                   <input type="text" value={newLocation.description} onChange={e => setNewLocation({ ...newLocation, description: e.target.value })} />
                 </div>
                 <button type="submit" className="download-btn" style={{ width: '100%' }}>
-                  {editingLocation ? 'Salvar Alterações' : 'Adicionar Local'}
+                  {editingLocation ? t('formSave') : t('locationAdd')}
                 </button>
               </form>
             </motion.div>
@@ -2111,17 +2181,17 @@ function App() {
                 <div style={{ width: '56px', height: '56px', background: 'var(--primary-gradient)', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem', boxShadow: '0 8px 20px rgba(0,113,227,0.3)' }}>
                   <User size={28} color="white" />
                 </div>
-                <h3 style={{ fontSize: '1.6rem', fontWeight: '800' }}>Acesso Restrito</h3>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Faça login para gerenciar o AppHub da Academy.</p>
+                <h3 style={{ fontSize: '1.6rem', fontWeight: '800' }}>{t('loginTitle')}</h3>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{t('loginSubtitle')}</p>
                 <button onClick={() => setIsLoginOpen(false)} style={{ position: 'absolute', right: '1.5rem', top: '1.5rem', background: 'none', border: 'none', color: '#86868b', cursor: 'pointer' }}><X size={20} /></button>
               </div>
               <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <div className="form-group">
-                  <label>Usuário</label>
+                  <label>{t('username')}</label>
                   <input type="text" required value={loginForm.username} onChange={e => setLoginForm({ ...loginForm, username: e.target.value })} />
                 </div>
                 <div className="form-group">
-                  <label>Senha</label>
+                  <label>{t('password')}</label>
                   <div style={{ position: 'relative' }}>
                     <input type={showPassword ? 'text' : 'password'} required value={loginForm.password}
                       onChange={e => setLoginForm({ ...loginForm, password: e.target.value })} style={{ width: '100%', paddingRight: '45px' }} />
@@ -2131,7 +2201,7 @@ function App() {
                     </button>
                   </div>
                 </div>
-                <button type="submit" className="download-btn" style={{ width: '100%', padding: '0.9rem' }}>Entrar</button>
+                <button type="submit" className="download-btn" style={{ width: '100%', padding: '0.9rem' }}>{t('loginBtn')}</button>
               </form>
             </motion.div>
           </div>
@@ -2146,34 +2216,34 @@ function App() {
               initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
               style={{ maxWidth: '540px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                <h3 style={{ fontSize: '1.4rem', fontWeight: '800' }}>Configurações</h3>
+                <h3 style={{ fontSize: '1.4rem', fontWeight: '800' }}>{t('settingsTitle')}</h3>
                 <X style={{ cursor: 'pointer' }} onClick={() => setIsSettingsOpen(false)} />
               </div>
 
               <div style={{ display: 'flex', gap: '0', marginBottom: '1.5rem', background: 'rgba(255,255,255,0.04)', borderRadius: '10px', padding: '3px', width: 'fit-content' }}>
                 {[
-                  { key: 'geral', label: 'Geral' },
-                  { key: 'notificacoes', label: 'Notificações (Zoom/WhatsApp)' },
-                  { key: 'seguranca', label: 'Segurança' }
-                ].map(t => (
-                  <button key={t.key} onClick={() => setSettingsTab(t.key)} style={{
+                  { key: 'geral', label: t('tabGeneral') },
+                  { key: 'notificacoes', label: t('tabNotifications') },
+                  { key: 'seguranca', label: t('tabSecurity') }
+                ].map(tab => (
+                  <button key={tab.key} onClick={() => setSettingsTab(tab.key)} style={{
                     padding: '0.5rem 1rem', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: '600', fontSize: '0.85rem',
-                    background: settingsTab === t.key ? 'rgba(255,255,255,0.1)' : 'transparent',
-                    color: settingsTab === t.key ? '#fff' : 'var(--text-secondary)'
-                  }}>{t.label}</button>
+                    background: settingsTab === tab.key ? 'rgba(255,255,255,0.1)' : 'transparent',
+                    color: settingsTab === tab.key ? '#fff' : 'var(--text-secondary)'
+                  }}>{tab.label}</button>
                 ))}
               </div>
 
               {settingsTab === 'geral' && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                   <div style={{ background: 'rgba(255,255,255,0.02)', padding: '1.2rem', borderRadius: '14px', border: '1px solid var(--glass-border)' }}>
-                    <h4 style={{ marginBottom: '0.8rem' }}>Status do Sistema</h4>
+                    <h4 style={{ marginBottom: '0.8rem' }}>{t('systemStatus')}</h4>
                     {[
-                      ['Versão', '2.5.0 (Apple Academy Edition)'],
-                      ['Total de Aplicativos', apps.length],
-                      ['Com Atualização Automática', autoUpdateCount],
-                      ['Rotina em Segundo Plano', '● Ativa (a cada 6h)'],
-                      ['Conexão API', '● Online']
+                      [t('settVersion'), '2.5.0 (Apple Academy Edition)'],
+                      [t('settTotalApps'), apps.length],
+                      [t('settAutoUpdate'), autoUpdateCount],
+                      [t('settBackground'), t('settBackgroundValue')],
+                      [t('settApiConn'), t('settApiOnline')]
                     ].map(([k, v]) => (
                       <div key={k} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', padding: '0.3rem 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
                         <span style={{ color: 'var(--text-secondary)' }}>{k}</span>
@@ -2182,7 +2252,7 @@ function App() {
                     ))}
                   </div>
                   <button onClick={handleLogout} style={{ padding: '0.8rem', borderRadius: '12px', border: '1px solid rgba(255,69,58,0.3)', background: 'rgba(255,69,58,0.08)', color: '#ff453a', cursor: 'pointer', fontWeight: '600' }}>
-                    Encerrar Sessão
+                    {t('endSession')}
                   </button>
                 </div>
               )}
@@ -2191,8 +2261,8 @@ function App() {
                 <form onSubmit={handleSaveNotificationSettings} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.8rem 1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
                     <div>
-                      <div style={{ fontWeight: '600', fontSize: '0.95rem' }}>Ativar Notificações Externas</div>
-                      <div style={{ fontSize: '0.8rem', color: '#86868b' }}>Avisa canais da Academy sobre novos softwares e atualizações</div>
+                      <div style={{ fontWeight: '600', fontSize: '0.95rem' }}>{t('enableNotifications')}</div>
+                      <div style={{ fontSize: '0.8rem', color: '#86868b' }}>{t('enableNotificationsSub')}</div>
                     </div>
                     <ToggleSwitch
                       checked={notificationSettings.enabled}
@@ -2203,7 +2273,7 @@ function App() {
                   {notificationSettings.enabled && (
                     <>
                       <div className="form-group">
-                        <label>Canal / Provedor</label>
+                        <label>{t('providerChannel')}</label>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.4rem' }}>
                           {[
                             { key: 'zoom', label: 'Zoom Chat' },
@@ -2230,7 +2300,7 @@ function App() {
 
                       {notificationSettings.provider !== 'email' && (
                         <div className="form-group">
-                          <label>URL do Webhook {notificationSettings.provider === 'zoom' ? '(Zoom Chat Incoming Webhook)' : ''}</label>
+                          <label>{t('webhookUrl')} {notificationSettings.provider === 'zoom' ? t('webhookZoomHint') : ''}</label>
                           <input
                             type="url"
                             placeholder="https://..."
@@ -2242,7 +2312,7 @@ function App() {
 
                       {notificationSettings.provider === 'whatsapp' && (
                         <div className="form-group">
-                          <label>Número do WhatsApp / Grupo (ex: 5511999999999 ou group-id)</label>
+                          <label>{t('whatsappNumber')}</label>
                           <input
                             type="text"
                             placeholder="5511999999999"
@@ -2254,7 +2324,7 @@ function App() {
 
                       {notificationSettings.provider !== 'email' && (
                         <div className="form-group">
-                          <label>Token / API Key (se exigido pelo provedor)</label>
+                          <label>{t('tokenApiKey')}</label>
                           <input
                             type="password"
                             placeholder="Bearer token ou API key..."
@@ -2268,26 +2338,26 @@ function App() {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', background: 'rgba(255,255,255,0.02)', padding: '1rem', borderRadius: '12px' }}>
                           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1rem' }}>
                             <div className="form-group">
-                              <label>Servidor SMTP</label>
+                              <label>{t('smtpServer')}</label>
                               <input type="text" placeholder="smtp.gmail.com" value={notificationSettings.smtpHost || ''} onChange={e => setNotificationSettings(p => ({ ...p, smtpHost: e.target.value }))} />
                             </div>
                             <div className="form-group">
-                              <label>Porta</label>
+                              <label>{t('smtpPort')}</label>
                               <input type="number" placeholder="587" value={notificationSettings.smtpPort || ''} onChange={e => setNotificationSettings(p => ({ ...p, smtpPort: e.target.value }))} />
                             </div>
                           </div>
                           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                             <div className="form-group">
-                              <label>Usuário / E-mail de Envio</label>
+                              <label>{t('smtpUser')}</label>
                               <input type="email" placeholder="seu-email@gmail.com" value={notificationSettings.smtpUser || ''} onChange={e => setNotificationSettings(p => ({ ...p, smtpUser: e.target.value }))} />
                             </div>
                             <div className="form-group">
-                              <label>Senha / Senha de App</label>
+                              <label>{t('smtpPass')}</label>
                               <input type="password" placeholder="********" value={notificationSettings.smtpPass || ''} onChange={e => setNotificationSettings(p => ({ ...p, smtpPass: e.target.value }))} />
                             </div>
                           </div>
                           <div className="form-group">
-                            <label>E-mail de Destino (Quem recebe)</label>
+                            <label>{t('smtpToEmail')}</label>
                             <input type="email" placeholder="lsa24@ifce.idserve.net" value={notificationSettings.toEmail || ''} onChange={e => setNotificationSettings(p => ({ ...p, toEmail: e.target.value }))} />
                           </div>
                         </div>
@@ -2300,7 +2370,7 @@ function App() {
                             checked={notificationSettings.notifyOnNewApp}
                             onChange={e => setNotificationSettings(p => ({ ...p, notifyOnNewApp: e.target.checked }))}
                           />
-                          Notificar ao cadastrar novo aplicativo
+                          {t('notifyNewApp')}
                         </label>
                         <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
                           <input
@@ -2308,7 +2378,7 @@ function App() {
                             checked={notificationSettings.notifyOnAutoUpdate}
                             onChange={e => setNotificationSettings(p => ({ ...p, notifyOnAutoUpdate: e.target.checked }))}
                           />
-                          Notificar quando o robô atualizar um aplicativo automaticamente
+                          {t('notifyAutoUpdate')}
                         </label>
                       </div>
 
@@ -2330,7 +2400,7 @@ function App() {
                           }}
                         >
                           <Send size={14} className={testingNotification ? 'spin' : ''} />
-                          {testingNotification ? 'Enviando teste...' : 'Testar Envio'}
+                          {testingNotification ? t('testingSend') : t('testSend')}
                         </button>
 
                         {notificationTestStatus && (
@@ -2343,7 +2413,7 @@ function App() {
                   )}
 
                   <button type="submit" className="download-btn" style={{ width: '100%', marginTop: '0.5rem' }}>
-                    Salvar Notificações
+                    {t('saveNotifications')}
                   </button>
                 </form>
               )}
@@ -2351,9 +2421,9 @@ function App() {
               {settingsTab === 'seguranca' && (
                 <form onSubmit={handleChangePassword} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                   {[
-                    { key: 'currentPassword', label: 'Senha Atual', show: showChangePasswords.current, toggle: () => setShowChangePasswords(p => ({ ...p, current: !p.current })) },
-                    { key: 'newPassword', label: 'Nova Senha', show: showChangePasswords.new, toggle: () => setShowChangePasswords(p => ({ ...p, new: !p.new })) },
-                    { key: 'confirmPassword', label: 'Confirmar Senha', show: showChangePasswords.confirm, toggle: () => setShowChangePasswords(p => ({ ...p, confirm: !p.confirm })) },
+                    { key: 'currentPassword', label: t('currentPassword'), show: showChangePasswords.current, toggle: () => setShowChangePasswords(p => ({ ...p, current: !p.current })) },
+                    { key: 'newPassword', label: t('newPassword'), show: showChangePasswords.new, toggle: () => setShowChangePasswords(p => ({ ...p, new: !p.new })) },
+                    { key: 'confirmPassword', label: t('confirmPassword'), show: showChangePasswords.confirm, toggle: () => setShowChangePasswords(p => ({ ...p, confirm: !p.confirm })) },
                   ].map(f => (
                     <div key={f.key} className="form-group">
                       <label>{f.label}</label>
@@ -2368,7 +2438,7 @@ function App() {
                       </div>
                     </div>
                   ))}
-                  <button type="submit" className="download-btn" style={{ width: '100%' }}>Atualizar Senha</button>
+                  <button type="submit" className="download-btn" style={{ width: '100%' }}>{t('savePassword')}</button>
                 </form>
               )}
             </motion.div>
