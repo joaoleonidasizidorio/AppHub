@@ -97,49 +97,90 @@ function StatusDot({ available, lang = 'pt' }) {
 }
 
 function LanguageSelector({ lang, setLang }) {
-  const toggle = (l) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const selectLang = (l) => {
     setLang(l);
     localStorage.setItem('apphub_lang', l);
+    setIsOpen(false);
   };
+
   return (
-    <div style={{
-      display: 'inline-flex', alignItems: 'center',
-      background: 'rgba(255, 255, 255, 0.06)',
-      backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-      border: '1px solid rgba(255, 255, 255, 0.15)',
-      borderRadius: '20px', padding: '3px', gap: '2px',
-      boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
-    }}>
+    <div ref={dropdownRef} style={{ position: 'relative', display: 'inline-block' }}>
       <button
         type="button"
-        onClick={() => toggle('pt')}
-        title="Português (Brasil)"
+        onClick={() => setIsOpen(!isOpen)}
         style={{
-          display: 'flex', alignItems: 'center', gap: '5px', border: 'none',
-          padding: '4px 10px', borderRadius: '16px', fontSize: '0.72rem', fontWeight: '700',
-          cursor: 'pointer', transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-          background: lang === 'pt' ? 'linear-gradient(135deg, #007aff, #5856d6)' : 'transparent',
-          color: lang === 'pt' ? '#ffffff' : '#86868b',
-          boxShadow: lang === 'pt' ? '0 2px 8px rgba(0, 122, 255, 0.35)' : 'none'
+          display: 'flex', alignItems: 'center', gap: '7px',
+          background: 'rgba(255, 255, 255, 0.08)',
+          border: '1px solid rgba(255, 255, 255, 0.15)',
+          borderRadius: '12px', padding: '8px 14px',
+          color: '#ffffff', fontSize: '0.85rem', fontWeight: '600',
+          cursor: 'pointer', backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          transition: 'all 0.2s ease',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
         }}
+        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.14)'}
+        onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)'}
       >
-        <span style={{ fontSize: '0.85rem' }}>🇧🇷</span> PT
+        <Globe size={18} style={{ color: 'var(--accent-primary)' }} />
+        <span>{lang === 'pt' ? 'Idioma' : 'Language'}</span>
+        <ChevronDown size={14} style={{ opacity: 0.7, transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
       </button>
-      <button
-        type="button"
-        onClick={() => toggle('en')}
-        title="English (US)"
-        style={{
-          display: 'flex', alignItems: 'center', gap: '5px', border: 'none',
-          padding: '4px 10px', borderRadius: '16px', fontSize: '0.72rem', fontWeight: '700',
-          cursor: 'pointer', transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-          background: lang === 'en' ? 'linear-gradient(135deg, #007aff, #5856d6)' : 'transparent',
-          color: lang === 'en' ? '#ffffff' : '#86868b',
-          boxShadow: lang === 'en' ? '0 2px 8px rgba(0, 122, 255, 0.35)' : 'none'
-        }}
-      >
-        <span style={{ fontSize: '0.85rem' }}>🇺🇸</span> EN
-      </button>
+
+      {isOpen && (
+        <div style={{
+          position: 'absolute', right: 0, top: 'calc(100% + 8px)',
+          background: 'rgba(24, 24, 28, 0.95)',
+          border: '1px solid rgba(255, 255, 255, 0.15)',
+          borderRadius: '14px', padding: '6px',
+          minWidth: '150px', zIndex: 1000,
+          boxShadow: '0 12px 32px rgba(0,0,0,0.4)',
+          backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)'
+        }}>
+          <button
+            type="button"
+            onClick={() => selectLang('pt')}
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%',
+              padding: '10px 12px', border: 'none', borderRadius: '10px',
+              background: lang === 'pt' ? 'rgba(0, 122, 255, 0.2)' : 'transparent',
+              color: lang === 'pt' ? '#64d2ff' : '#ffffff',
+              fontSize: '0.85rem', fontWeight: '600', cursor: 'pointer', textAlign: 'left'
+            }}
+          >
+            <span>🇧🇷 Português</span>
+            {lang === 'pt' && <Check size={16} />}
+          </button>
+          <button
+            type="button"
+            onClick={() => selectLang('en')}
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%',
+              padding: '10px 12px', border: 'none', borderRadius: '10px',
+              background: lang === 'en' ? 'rgba(0, 122, 255, 0.2)' : 'transparent',
+              color: lang === 'en' ? '#64d2ff' : '#ffffff',
+              fontSize: '0.85rem', fontWeight: '600', cursor: 'pointer', textAlign: 'left',
+              marginTop: '4px'
+            }}
+          >
+            <span>🇺🇸 English</span>
+            {lang === 'en' && <Check size={16} />}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -1005,7 +1046,6 @@ function App() {
               </div>
             </div>
           </div>
-          <LanguageSelector lang={lang} setLang={setLang} />
         </div>
 
         <nav className="nav-links">
@@ -1023,23 +1063,27 @@ function App() {
             {fileCount > 0 && <span style={{ marginLeft: 'auto', fontSize: '0.7rem', background: 'rgba(255,255,255,0.1)', padding: '1px 7px', borderRadius: '10px' }}>{fileCount}</span>}
           </div>
 
-          <div style={{ height: '1px', background: 'var(--glass-border)', margin: '0.8rem 0' }} />
-          <div style={{ fontSize: '0.65rem', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '0 0.5rem', marginBottom: '0.3rem' }}>{t('navManagement')}</div>
+          {token && (
+            <>
+              <div style={{ height: '1px', background: 'var(--glass-border)', margin: '0.8rem 0' }} />
+              <div style={{ fontSize: '0.65rem', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '0 0.5rem', marginBottom: '0.3rem' }}>{t('navManagement')}</div>
 
-          <div className={`nav-item ${activeView === 'monitor' ? 'active' : ''}`}
-            onClick={() => setActiveView('monitor')}>
-            <Monitor size={18} /><span>{t('navMonitor')}</span>
-            {autoUpdateCount > 0 && (
-              <span style={{ marginLeft: 'auto', fontSize: '0.65rem', background: 'rgba(175,82,222,0.3)', color: '#d896ff', padding: '1px 6px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '3px' }}>
-                <Zap size={9} /> {autoUpdateCount}
-              </span>
-            )}
-          </div>
+              <div className={`nav-item ${activeView === 'monitor' ? 'active' : ''}`}
+                onClick={() => setActiveView('monitor')}>
+                <Monitor size={18} /><span>{t('navMonitor')}</span>
+                {autoUpdateCount > 0 && (
+                  <span style={{ marginLeft: 'auto', fontSize: '0.65rem', background: 'rgba(175,82,222,0.3)', color: '#d896ff', padding: '1px 6px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                    <Zap size={9} /> {autoUpdateCount}
+                  </span>
+                )}
+              </div>
 
-          <div className={`nav-item ${activeView === 'locations' ? 'active' : ''}`}
-            onClick={() => setActiveView('locations')}>
-            <MapPin size={18} /><span>{t('navLocations')}</span>
-          </div>
+              <div className={`nav-item ${activeView === 'locations' ? 'active' : ''}`}
+                onClick={() => setActiveView('locations')}>
+                <MapPin size={18} /><span>{t('navLocations')}</span>
+              </div>
+            </>
+          )}
 
           {/* Categories - only when on apps view */}
           {activeView === 'apps' && contentTab === 'apps' && (
@@ -1058,13 +1102,19 @@ function App() {
         </nav>
 
         <div style={{ marginTop: 'auto' }} className="nav-links">
-          <div className={`nav-item ${isSettingsOpen ? 'active' : ''}`}
-            onClick={() => token ? setIsSettingsOpen(true) : setIsLoginOpen(true)}>
-            <Settings size={18} /><span>{t('navSettings')}</span>
-          </div>
-          {token && (
-            <div className="nav-item" onClick={handleLogout} title={t('navLogout')}>
-              <User size={18} /><span>{t('navLogout')}</span>
+          {token ? (
+            <>
+              <div className={`nav-item ${isSettingsOpen ? 'active' : ''}`}
+                onClick={() => setIsSettingsOpen(true)}>
+                <Settings size={18} /><span>{t('navSettings')}</span>
+              </div>
+              <div className="nav-item" onClick={handleLogout} title={t('navLogout')}>
+                <User size={18} /><span>{t('navLogout')}</span>
+              </div>
+            </>
+          ) : (
+            <div className="nav-item" onClick={() => setIsLoginOpen(true)} title="Admin Login" style={{ opacity: 0.7 }}>
+              <User size={18} /><span>Entrar</span>
             </div>
           )}
         </div>
@@ -1112,13 +1162,9 @@ function App() {
               </button>
             )}
 
-            {token ? (
+            {token && (
               <button className="download-btn" onClick={() => setIsModalOpen(true)}>
                 <Plus size={18} /> {t('navNewApp')}
-              </button>
-            ) : (
-              <button className="download-btn" style={{ background: 'rgba(255,255,255,0.1)', color: '#fff' }} onClick={() => setIsLoginOpen(true)}>
-                {t('navLoginAdmin')}
               </button>
             )}
           </div>
