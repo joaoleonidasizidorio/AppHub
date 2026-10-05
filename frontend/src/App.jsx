@@ -1097,7 +1097,8 @@ function App() {
             </div>
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex gap-4" style={{ alignItems: 'center' }}>
+            <LanguageSelector lang={lang} setLang={setLang} />
             {token && autoUpdateCount > 0 && (
               <button
                 className="download-btn"
