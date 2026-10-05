@@ -107,6 +107,14 @@ const downloadFileWithProgress = async (fileUrl, suggestedFilename, appId, onPro
         const finalPath = path.join(UPLOADS_DIR, finalFilename);
         fs.renameSync(tempPath, finalPath);
 
+        // Remover atributo de quarentena do macOS se o servidor estiver em Mac
+        if (process.platform === 'darwin') {
+            try {
+                const { execSync } = require('child_process');
+                execSync(`xattr -d com.apple.quarantine "${finalPath}"`, { stdio: 'ignore' });
+            } catch (e) {}
+        }
+
         const stats = fs.statSync(finalPath);
         return {
             filename: finalFilename,
